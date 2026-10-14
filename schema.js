@@ -16,15 +16,15 @@
     const txt = libelle(it, opts), tw = largeurTexte(txt);
     let w, h;
     if (it.t === "debut" || it.t === "fin") { w = Math.max(90, tw + 36); h = 34; }
-    else if (it.t === "es") { w = Math.max(120, tw + 48); h = 38; }
+
     else { w = Math.max(110, tw + 28); h = 38; }
-    const classe = (it.trou ? "sch-trou " : "") + "sch-" + it.t;
+    // Entrées / sorties (Lire, Afficher) : rectangle, comme les actions.
+    const classe = (it.trou ? "sch-trou " : "") + "sch-" + (it.t === "es" ? "action" : it.t);
     return {
       L: w / 2, R: w / 2, H: h,
       dessin(x, y) {
         let forme;
         if (it.t === "debut" || it.t === "fin") forme = `<rect x="${x - w / 2}" y="${y}" width="${w}" height="${h}" rx="${h / 2}" class="${classe}"/>`;
-        else if (it.t === "es") { const k = 12; forme = `<polygon points="${x - w / 2 + k},${y} ${x + w / 2},${y} ${x + w / 2 - k},${y + h} ${x - w / 2},${y + h}" class="${classe}"/>`; }
         else forme = `<rect x="${x - w / 2}" y="${y}" width="${w}" height="${h}" rx="4" class="${classe}"/>`;
         return forme + `<text x="${x}" y="${y + h / 2}" class="sch-texte${it.trou ? " sch-texte-trou" : ""}">${esc(txt)}</text>`;
       }

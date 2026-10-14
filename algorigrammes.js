@@ -4,7 +4,8 @@
  * Les schémas sont décrits avec ces briques (dessinées automatiquement) :
  *   DEBUT, FIN              ovale de début / fin
  *   act("texte")            rectangle : action ou calcul (affectation avec ←)
- *   es("texte")             parallélogramme : entrée (Lire) ou sortie (Afficher)
+ *   Convention de la classe : ovale = début/fin, losange = test, rectangle = tout le reste.
+ *   es("texte")             rectangle : entrée (Lire) ou sortie (Afficher)
  *   si("test ?", [oui], [non])        losange avec deux branches
  *   tantque("test ?", [corps])        boucle : on répète le corps tant que le test est vrai
  *   Une brique avec trou: "A" est affichée comme une case à compléter.
@@ -32,27 +33,26 @@
 <p>Un <strong>algorigramme</strong> (ou organigramme) représente un algorithme par un dessin. On le lit <strong>de haut en bas, en suivant les flèches</strong>.</p>
 <table class="ops">
 <tr><td><span class="forme ovale">Début</span></td><td><strong>Ovale</strong> : le début et la fin.</td></tr>
-<tr><td><span class="forme para">Lire n</span></td><td><strong>Parallélogramme</strong> : une entrée (<em>Lire</em>, l'utilisateur tape une valeur, un capteur mesure) ou une sortie (<em>Afficher</em>).</td></tr>
-<tr><td><span class="forme rect">n ← n × 2</span></td><td><strong>Rectangle</strong> : une action ou un calcul. La flèche <code>←</code> signifie « prend la valeur » : <code>n ← n × 2</code> veut dire « n prend la valeur n × 2 ».</td></tr>
+<tr><td><span class="forme rect">n ← n × 2</span></td><td><strong>Rectangle</strong> : une action. Ce peut être un calcul, une entrée (<em>Lire</em> : l'utilisateur tape une valeur, un capteur mesure) ou une sortie (<em>Afficher</em>). La flèche <code>←</code> signifie « prend la valeur » : <code>n ← n × 2</code> veut dire « n prend la valeur n × 2 ».</td></tr>
 <tr><td><span class="forme losange">n > 10 ?</span></td><td><strong>Losange</strong> : un test. La réponse est <em>oui</em> ou <em>non</em>, et on suit la flèche correspondante.</td></tr>
 </table>`,
       schemaCours: SYMBOLES,
       exercices: [
         { id: "g1e1", titre: "Début et fin", type: "qcm",
           enonce: "<p>Quel symbole marque le <strong>début</strong> et la <strong>fin</strong> d'un algorigramme ?</p>",
-          choix: ["L'ovale", "Le rectangle", "Le losange", "Le parallélogramme"], bonne: 0,
+          choix: ["L'ovale", "Le rectangle", "Le losange", "Le cercle"], bonne: 0,
           explication: "Un algorigramme commence et se termine toujours par un ovale.",
           indices: ["Regarde le haut et le bas du schéma du cours."] },
         { id: "g1e2", titre: "Le test", type: "qcm",
           enonce: "<p>Dans quel symbole écrit-on un <strong>test</strong>, c'est-à-dire une question à laquelle on répond oui ou non ?</p>",
-          choix: ["Le losange", "Le rectangle", "L'ovale", "Le parallélogramme"], bonne: 0,
+          choix: ["Le losange", "Le rectangle", "L'ovale", "Le cercle"], bonne: 0,
           explication: "Le losange a deux sorties : une pour oui, une pour non.",
           indices: ["C'est le seul symbole d'où partent deux flèches."] },
-        { id: "g1e3", titre: "Entrée ou action ?", type: "qcm",
+        { id: "g1e3", titre: "Afficher, c'est quoi ?", type: "qcm",
           enonce: "<p>Dans quel symbole écrit-on <code>Afficher \"Bonjour\"</code> ?</p>",
-          choix: ["Le parallélogramme (entrée / sortie)", "Le rectangle (action / calcul)", "Le losange (test)", "L'ovale (début / fin)"], bonne: 0,
-          explication: "Afficher est une sortie : on utilise le parallélogramme, comme pour Lire.",
-          indices: ["Lire et Afficher utilisent le même symbole."] },
+          choix: ["Le rectangle (action)", "Le losange (test)", "L'ovale (début / fin)", "Le cercle"], bonne: 0,
+          explication: "Afficher est une action : on l'écrit dans un rectangle, comme Lire et les calculs.",
+          indices: ["Ce n'est ni un début, ni une fin, ni une question."] },
         { id: "g1e4", titre: "Que fait cet algorigramme ?", type: "qcm",
           schema: [DEBUT, es("Lire prix"), act("total ← prix × 3"), es("Afficher total"), FIN],
           enonce: "<p>Que fait cet algorigramme ?</p>",
