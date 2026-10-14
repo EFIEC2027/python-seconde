@@ -512,7 +512,8 @@ function choisir(id) {
   $("cours-texte").innerHTML = exo.module.cours;
   $("cours").open = exo.num.endsWith(".1") && !S.tentes.has(exo.id);
   $("enonce").innerHTML = exo.enonce;
-  editeur.setValue(S.codes[exo.id] !== undefined ? S.codes[exo.id] : exo.depart);
+  const sauve = S.codes[exo.id];
+  editeur.setValue(sauve && sauve.trim() ? sauve : exo.depart);
   editeur.clearHistory();
   const avecClavier = exo.tests.some(t => t.entree);
   $("clavier").hidden = !avecClavier;
