@@ -78,6 +78,12 @@ h1, h2 { font-family: var(--f-titre); line-height: 1.15; margin: 0; text-wrap: b
 .enonce pre.sortie { border-style: dashed; color: var(--doux); }
 pre.programme { font-size: 1rem; line-height: 1.6; }
 :not(pre) > code { background: var(--surligne-doux); padding: .05em .3em; border-radius: 4px; }
+.qcm { display: grid; gap: .5rem; }
+.choix { display: flex; align-items: center; gap: .7rem; padding: .7rem .9rem; border: 1.5px solid var(--trait); border-radius: 10px; background: var(--papier); cursor: pointer; }
+.choix:hover { border-color: var(--accent); }
+.choix.coche { border-color: var(--accent); background: #e8eef9; }
+.choix input { width: 1.1rem; height: 1.1rem; accent-color: var(--accent); }
+.choix code { background: none; padding: 0; font-size: 1rem; }
 .reponse-texte { display: grid; gap: .3rem; }
 .reponse-texte label { font-weight: 700; }
 .reponse-texte textarea { font-family: var(--f-code); border: 1.5px solid var(--trait); border-radius: 8px; padding: .6rem .8rem; min-height: 7rem; resize: vertical; background: var(--papier); }
@@ -200,6 +206,7 @@ pre.programme { font-size: 1rem; line-height: 1.6; }
         </div>
         <div class="enonce" id="q-enonce"></div>
         <pre class="programme" id="q-programme" hidden></pre>
+        <div class="qcm" id="q-qcm" role="radiogroup" aria-label="Choisis une réponse" hidden></div>
         <div class="reponse-texte" id="q-texte" hidden>
           <label for="q-reponse">Ce que le programme affiche (une ligne par ligne affichée)</label>
           <textarea id="q-reponse" spellcheck="false" autocomplete="off"></textarea>
@@ -350,7 +357,14 @@ function tirerQuestions(brutes) {
   for (let i = ordre.length - 1; i > 0; i--) { const j = Math.floor(alea() * (i + 1)); [ordre[i], ordre[j]] = [ordre[j], ordre[i]]; }
   return ordre.map(k => {
     const q = brutes[k], v = Math.floor(alea() * q.variantes.length);
-    return { ...q.variantes[v], points: q.points, titre: q.titre, num: k + 1, version: "ABC"[v] };
+    const choisie = { ...q.variantes[v], points: q.points, titre: q.titre, num: k + 1, version: "ABC"[v] };
+    if (choisie.type === "qcm") {
+      choisie.bonneReponse = choisie.choix[choisie.bonne];
+      const c = [...choisie.choix];
+      for (let i = c.length - 1; i > 0; i--) { const j = Math.floor(alea() * (i + 1)); [c[i], c[j]] = [c[j], c[i]]; }
+      choisie.choix = c;
+    }
+    return choisie;
   });
 }
 const sur20 = (total, max) => max ? Math.round(total / max * 20 * 2) / 2 : 0;
@@ -509,6 +523,20 @@ function demarrerEpreuve() {
   else if (S.reprise) incident("reprise", true);
 }
 
+function dessinerChoix(q, i) {
+  const zone = $("q-qcm");
+  zone.innerHTML = "";
+  q.choix.forEach((c, k) => {
+    const l = document.createElement("label");
+    l.className = "choix" + (S.reponses[i] === c ? " coche" : "");
+    const r = document.createElement("input");
+    r.type = "radio"; r.name = "qcm"; r.id = "choix-" + k; r.checked = S.reponses[i] === c;
+    r.addEventListener("change", () => { S.reponses[i] = c; modifie(); dessinerChoix(q, i); });
+    const t = document.createElement("code"); t.textContent = c;
+    l.append(r, t);
+    zone.appendChild(l);
+  });
+}
 function estRepondu(i) {
   const q = S.questions[i], r = S.reponses[i];
   if (r === undefined || !String(r).trim()) return false;
@@ -539,9 +567,10 @@ function afficherQuestion(i) {
   $("q-titre").append(q.titre);
   const sm = document.createElement("small"); sm.textContent = `${q.points} points`; $("q-titre").appendChild(sm);
   $("q-enonce").innerHTML = q.enonce;
-  const code = q.type === "code";
-  $("q-programme").hidden = code;
-  $("q-texte").hidden = code;
+  const code = q.type === "code", qcm = q.type === "qcm";
+  $("q-programme").hidden = code || !q.programme;
+  $("q-texte").hidden = code || qcm;
+  $("q-qcm").hidden = !qcm;
   $("q-code").hidden = !code;
   $("b-executer").hidden = !code;
   $("b-depart").hidden = !code;
@@ -552,8 +581,9 @@ function afficherQuestion(i) {
     editeur.clearHistory();
     setTimeout(() => { editeur.refresh(); editeur.focus(); }, 0);
   } else {
-    $("q-programme").textContent = q.programme;
-    $("q-reponse").value = S.reponses[i] || "";
+    $("q-programme").textContent = q.programme || "";
+    if (qcm) dessinerChoix(q, i);
+    else $("q-reponse").value = S.reponses[i] || "";
   }
   $("b-prec").disabled = i === 0;
   $("b-suiv").hidden = i === S.questions.length - 1;
@@ -658,6 +688,10 @@ function normaliserReponse(t) {
 function derniereLigne(t) { const l = String(t).replace(/\r/g, "").split("\n").map(x => x.trimEnd()).filter(x => x !== ""); return l.length ? l[l.length - 1] : ""; }
 
 async function corrigerQuestion(q, rep) {
+  if (q.type === "qcm") {
+    const ok = rep === q.bonneReponse;
+    return { q: q.num, v: q.version, points: ok ? q.points : 0, max: q.points, juste: ok };
+  }
   if (q.type === "prediction") {
     const ok = [q.attendu, ...(q.accepte || [])].some(a => normaliserReponse(a) === normaliserReponse(rep));
     return { q: q.num, v: q.version, points: ok ? q.points : 0, max: q.points, juste: ok };
@@ -732,7 +766,11 @@ function afficherCorrection() {
     h.append(t, pts);
     art.appendChild(h);
     const corps = document.createElement("div"); corps.className = "cor-corps";
-    if (q.type === "prediction") {
+    if (q.type === "qcm") {
+      if (q.programme) corps.appendChild(bloc("L'instruction", q.programme, "prog"));
+      corps.appendChild(bloc("Ta réponse", S.reponses[i] || "(pas de réponse)"));
+      corps.appendChild(bloc("Bonne réponse", q.bonneReponse, "bon"));
+    } else if (q.type === "prediction") {
       corps.appendChild(bloc("Le programme", q.programme, "prog"));
       corps.appendChild(bloc("Ta réponse", (S.reponses[i] || "").trim() || "(pas de réponse)"));
       corps.appendChild(bloc("Bonne réponse", q.attendu, "bon"));
