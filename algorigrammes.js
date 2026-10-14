@@ -14,7 +14,7 @@
  *   qcm       : choisir une réponse (choix, bonne = indice de la bonne réponse)
  *   suivre    : faire fonctionner l'algorigramme et donner le résultat (attendu, accepte)
  *   completer : choisir le contenu de chaque case vide (trous: { A: { choix, bonne } })
- *   python    : traduire l'algorigramme en Python (tests comme dans exercices.js)
+ *   python    : traduire en Python (possible, mais non utilisé : ce parcours vient avant Python)
  * Ne changez pas l'id d'un exercice déjà utilisé par les élèves.
  */
 (function () {
@@ -70,7 +70,7 @@
 <tr><td>a ← 4</td><td>4</td><td></td></tr>
 <tr><td>b ← a + 3</td><td>4</td><td>7</td></tr>
 <tr><td>a ← b × 2</td><td>14</td><td>7</td></tr></table>
-<p>En Python, <code>a ← 4</code> s'écrit <code>a = 4</code>, <code>Lire n</code> s'écrit <code>n = int(input())</code> et <code>Afficher a</code> s'écrit <code>print(a)</code>.</p>`,
+`,
       exercices: [
         { id: "g2e1", titre: "Faire tourner à la main", type: "suivre",
           schema: [DEBUT, act("a ← 4"), act("b ← a + 3"), act("a ← b × 2"), es("Afficher a"), FIN],
@@ -88,26 +88,23 @@
           trous: { A: { choix: ["secondes ← minutes × 60", "secondes ← minutes + 60", "minutes ← secondes × 60", "Afficher minutes"], bonne: 0 } },
           explication: "Une minute = 60 secondes : secondes prend la valeur minutes × 60.",
           indices: ["La variable affichée à la fin doit avoir été calculée avant.", "Combien de secondes dans une minute ?"] },
-        { id: "g2e4", titre: "En Python : le carré", type: "python",
-          schema: [DEBUT, es("Lire n"), act("carre ← n × n"), es("Afficher carre"), FIN],
-          enonce: "<p>Traduis cet algorigramme en Python. La première ligne est déjà écrite.</p>",
-          depart: "n = int(input())\n",
-          tests: [{ entree: "3", attendu: "9" }, { entree: "-4", attendu: "16" }, { entree: "0", attendu: "0" }],
-          exige: [{ motif: "carre\\s*=", message: "Utilise une variable carre, comme dans l'algorigramme." }],
-          indices: ["carre ← n × n s'écrit carre = n * n", "Afficher carre s'écrit print(carre)"] }
+        { id: "g2e4", titre: "Compléter : la moyenne", type: "completer",
+          schema: [DEBUT, es("Lire note1"), es("Lire note2"), act("", "A"), es("", "B"), FIN],
+          enonce: "<p>Cet algorigramme doit calculer puis afficher la moyenne de deux notes. Complète les cases <strong>A</strong> et <strong>B</strong>.</p>",
+          trous: {
+            A: { choix: ["moyenne ← (note1 + note2) ÷ 2", "moyenne ← note1 + note2", "Afficher moyenne", "Lire moyenne"], bonne: 0 },
+            B: { choix: ["Afficher moyenne", "Lire moyenne", "moyenne ← 0", "Afficher note1"], bonne: 0 }
+          },
+          explication: "On calcule d'abord la moyenne (A), puis on l'affiche (B). Pour la moyenne de deux notes, on les additionne et on divise par 2.",
+          indices: ["On ne peut afficher la moyenne qu'après l'avoir calculée.", "La moyenne de deux nombres : on les additionne, puis on divise par 2."] }
       ]
     },
     {
       id: "g3", titre: "Conditions", notion: "si… alors… sinon",
       cours: `
 <p>Un <strong>losange</strong> pose une question. Selon la réponse, on suit la branche <strong>oui</strong> ou la branche <strong>non</strong>, puis les deux chemins se rejoignent.</p>
-<p>En Python :</p>
-<pre>age = int(input())
-if age >= 18:
-    print("majeur")
-else:
-    print("mineur")</pre>
-<p>Les signes : <code>≥</code> s'écrit <code>&gt;=</code>, <code>≤</code> s'écrit <code>&lt;=</code>, <code>=</code> (pour comparer) s'écrit <code>==</code>, <code>≠</code> s'écrit <code>!=</code>.</p>`,
+<p>Les signes de comparaison : <code>&lt;</code> plus petit que, <code>&gt;</code> plus grand que, <code>≤</code> plus petit ou égal, <code>≥</code> plus grand ou égal, <code>=</code> égal, <code>≠</code> différent.</p>
+<p>Attention : 18 ≥ 18 est <strong>vrai</strong>, mais 18 &gt; 18 est <strong>faux</strong>.</p>`,
       schemaCours: [DEBUT, es("Lire age"), si("age ≥ 18 ?", [es("Afficher \"majeur\"")], [es("Afficher \"mineur\"")]), FIN],
       exercices: [
         { id: "g3e1", titre: "Majeur ou mineur", type: "suivre",
@@ -130,13 +127,12 @@ else:
           },
           explication: "Le test est « note ≥ 10 ? » ; si oui, on affiche admis.",
           indices: ["La case A est un losange : c'est un test.", "La branche oui correspond au cas où le test est vrai."] },
-        { id: "g3e4", titre: "En Python : pair ou impair", type: "python",
-          schema: [DEBUT, es("Lire n"), si("reste de n ÷ 2 = 0 ?", [es("Afficher \"pair\"")], [es("Afficher \"impair\"")]), FIN],
-          enonce: "<p>Traduis cet algorigramme en Python. Le reste de la division de n par 2 s'écrit <code>n % 2</code>.</p>",
-          depart: "n = int(input())\n",
-          tests: [{ entree: "4", attendu: "pair" }, { entree: "7", attendu: "impair" }, { entree: "0", attendu: "pair" }],
-          exige: [{ motif: "\\bif\\b", message: "Utilise if pour le losange." }],
-          indices: ["if n % 2 == 0:", "N'oublie pas else: et les décalages de 4 espaces."] }
+        { id: "g3e4", titre: "Quelle valeur pour gagner ?", type: "qcm",
+          schema: [DEBUT, es("Lire n"), si("n = 7 ?", [es("Afficher \"gagné\"")], [es("Afficher \"perdu\"")]), FIN],
+          enonce: "<p>Quel nombre l'utilisateur doit-il taper pour que l'algorigramme affiche <code>gagné</code> ?</p>",
+          choix: ["7", "0", "6", "Il ne peut jamais gagner"], bonne: 0,
+          explication: "On affiche gagné seulement si la réponse au test n = 7 est oui.",
+          indices: ["Pars de « gagné » et remonte la flèche jusqu'au losange."] }
       ]
     },
     {
@@ -146,7 +142,7 @@ else:
 <p>Pour suivre une boucle, on note les valeurs à chaque tour :</p>
 <table class="trace"><tr><th>Tour</th><th>i avant le test</th><th>i &lt; 3 ?</th></tr>
 <tr><td>1</td><td>0</td><td>oui</td></tr><tr><td>2</td><td>1</td><td>oui</td></tr><tr><td>3</td><td>2</td><td>oui</td></tr><tr><td>–</td><td>3</td><td>non : on sort</td></tr></table>
-<p>En Python : <code>while i &lt; 3:</code> puis les blocs de la boucle décalés de 4 espaces.</p>`,
+<p>Attention : si rien ne change dans la boucle, le test reste toujours vrai et la boucle ne s'arrête jamais.</p>`,
       schemaCours: [DEBUT, act("i ← 0"), tantque("i < 3 ?", [es("Afficher \"Bip\""), act("i ← i + 1")]), FIN],
       exercices: [
         { id: "g4e1", titre: "Combien de Bip ?", type: "suivre",
@@ -165,14 +161,11 @@ else:
           trous: { A: { choix: ["n ← n − 1", "n ← n + 1", "n ← 0", "Afficher n"], bonne: 0 } },
           explication: "n doit diminuer de 1 à chaque tour, sinon la boucle ne s'arrête jamais.",
           indices: ["Que doit devenir n après avoir affiché 5 ?", "Si n ne diminue pas, le test n > 0 reste toujours vrai."] },
-        { id: "g4e4", titre: "En Python : somme de 1 à 10", type: "python",
-          schema: [DEBUT, act("total ← 0"), act("i ← 1"), tantque("i ≤ 10 ?", [act("total ← total + i"), act("i ← i + 1")]), es("Afficher total"), FIN],
-          enonce: "<p>Traduis cet algorigramme en Python avec une boucle <code>while</code>.</p>",
-          depart: "total = 0\ni = 1\n",
-          tests: [{ entree: "", attendu: "55" }],
-          exige: [{ motif: "\\bwhile\\b", message: "Utilise une boucle while, comme dans l'algorigramme." }],
-          interdit: [{ motif: "\\b55\\b", message: "Le résultat doit être calculé par la boucle." }],
-          indices: ["while i <= 10:", "Dans la boucle : total = total + i puis i = i + 1. Le print se place après la boucle, sans décalage."] }
+        { id: "g4e4", titre: "La somme", type: "suivre",
+          schema: [DEBUT, act("total ← 0"), act("i ← 1"), tantque("i ≤ 4 ?", [act("total ← total + i"), act("i ← i + 1")]), es("Afficher total"), FIN],
+          enonce: "<p>Fais tourner la boucle à la main, en notant total et i à chaque tour.</p>", question: "Qu'affiche l'algorigramme ?",
+          attendu: "10", explication: "total vaut 1, puis 3, puis 6, puis 10 (1 + 2 + 3 + 4). Quand i vaut 5, le test i ≤ 4 est faux.",
+          indices: ["Fais un tableau avec deux colonnes : total et i.", "Au 1er tour, total ← 0 + 1 = 1 et i devient 2."] }
       ]
     },
     {
@@ -203,13 +196,15 @@ else:
           },
           explication: "On teste si la distance est plus petite que 10 ; si oui, on déclenche l'alarme.",
           indices: ["« À moins de 10 cm » veut dire « distance plus petite que 10 »."] },
-        { id: "g5e4", titre: "En Python : l'arrosage", type: "python",
-          schema: [DEBUT, es("Lire humidite"), tantque("humidite < 40 ?", [es("Afficher \"arrosage\""), act("humidite ← humidite + 10")]), es("Afficher \"terminé\""), FIN],
-          enonce: "<p>Traduis cet algorigramme en Python.</p>",
-          depart: "humidite = int(input())\n",
-          tests: [{ entree: "15", attendu: "arrosage\narrosage\narrosage\nterminé" }, { entree: "40", attendu: "terminé" }, { entree: "35", attendu: "arrosage\nterminé" }],
-          exige: [{ motif: "\\bwhile\\b", message: "Utilise une boucle while." }],
-          indices: ["while humidite < 40:", "Dans la boucle : print(\"arrosage\") puis humidite = humidite + 10. print(\"terminé\") après la boucle."] }
+        { id: "g5e4", titre: "Compléter : l'arrosage", type: "completer",
+          schema: [DEBUT, es("Lire humidite"), tantque("", [es("Arroser 1 minute"), act("", "B")], "A"), es("Afficher \"terminé\""), FIN],
+          enonce: "<p>Chaque minute d'arrosage augmente l'humidité de 10. L'arrosage doit continuer <strong>tant que l'humidité est inférieure à 40</strong>. Complète les cases <strong>A</strong> et <strong>B</strong>.</p>",
+          trous: {
+            A: { choix: ["humidite < 40 ?", "humidite > 40 ?", "humidite ← 40", "Arroser 1 minute"], bonne: 0 },
+            B: { choix: ["humidite ← humidite + 10", "humidite ← humidite − 10", "humidite ← 40", "Afficher \"terminé\""], bonne: 0 }
+          },
+          explication: "On arrose tant que humidite < 40, et chaque minute ajoute 10 à l'humidité.",
+          indices: ["La case A est le test de la boucle.", "Après chaque minute d'arrosage, que devient l'humidité ?"] }
       ]
     }
   ];

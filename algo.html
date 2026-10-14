@@ -303,11 +303,11 @@ table.trace th { background: var(--fond); font-size: .85rem; }
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
-<script src="config.js"></script>
-<script src="algorigrammes.js"></script>
-<script src="schema.js"></script>
+<script src="config.js?v=20261014c"></script>
+<script src="algorigrammes.js?v=20261014c"></script>
+<script src="schema.js?v=20261014c"></script>
 <script>window.PARCOURS = window.PARCOURS_ALGO;</script>
-<script src="verif.js"></script>
+<script src="verif.js?v=20261014c"></script>
 <script>
 "use strict";
 const URL_SERVEUR = (window.CONFIG && CONFIG.url || "").trim();
@@ -335,7 +335,7 @@ class Python {
   constructor() { this.attente = new Map(); this.n = 0; this.demarrer(); }
   demarrer() {
     this.pret = new Promise((ok, ko) => { this._ok = ok; this._ko = ko; });
-    this.w = new Worker("worker.js");
+    this.w = new Worker("worker.js?v=20261014c");
     this.w.onmessage = e => {
       const d = e.data;
       if (d.type === "pret") { this._ok(); pythonPret = true; etatPython(true); }
