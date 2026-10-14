@@ -62,6 +62,7 @@ h1, h2, h3 { font-family: var(--f-titre); margin: 0; line-height: 1.15; text-wra
 .filtres { display: flex; gap: .4rem; flex-wrap: wrap; }
 .puce { border: 1.5px solid var(--trait); background: var(--fond); border-radius: 99px; padding: .25rem .8rem; cursor: pointer; font-weight: 700; font-size: .9rem; }
 .puce[aria-pressed=true] { background: var(--encre); color: var(--papier); border-color: var(--encre); }
+#choix-parcours .puce[aria-pressed=true] { background: var(--accent); border-color: var(--accent); }
 .droite { margin-left: auto; display: flex; gap: .6rem; align-items: center; flex-wrap: wrap; }
 .maj { color: var(--doux); font-size: .85rem; }
 .onglets { display: flex; gap: .2rem; max-width: 1280px; margin: .6rem auto 0; overflow-x: auto; }
@@ -172,6 +173,10 @@ select#choix-eleve { border: 1.5px solid var(--trait); border-radius: 8px; paddi
   <header class="barre">
     <div class="barre-haut">
       <h1>Suivi <span>Python</span></h1>
+      <div class="filtres" id="choix-parcours" role="group" aria-label="Parcours">
+        <button type="button" class="puce" data-parcours="python" aria-pressed="true">Python</button>
+        <button type="button" class="puce" data-parcours="algo" aria-pressed="false">Algorigrammes</button>
+      </div>
       <div class="filtres" id="filtres" role="group" aria-label="Classe"></div>
       <div class="droite">
         <span class="maj" id="maj"></span>
@@ -195,7 +200,7 @@ select#choix-eleve { border: 1.5px solid var(--trait); border-radius: 8px; paddi
       <div class="chiffres" id="chiffres"></div>
       <div class="panneau">
         <h2>Progression dans le temps</h2>
-        <p class="sous">Nombre moyen d'exercices réussis par élève, jour après jour (sur 32).</p>
+        <p class="sous" id="sous-progression">Nombre moyen d'exercices réussis par élève, jour après jour.</p>
         <div class="graphe haut"><canvas id="g-progression"></canvas></div>
       </div>
       <div class="grille-2">
@@ -311,20 +316,34 @@ select#choix-eleve { border: 1.5px solid var(--trait); border-radius: 8px; paddi
 <script src="config.js"></script>
 <script src="exercices.js"></script>
 <script src="evaluations.js"></script>
+<script>window.PARCOURS_PYTHON = window.PARCOURS;</script>
+<script src="algorigrammes.js"></script>
 <script>
 "use strict";
 const URL_SERVEUR = (window.CONFIG && CONFIG.url || "").trim();
 const DEMO = !URL_SERVEUR;
 const $ = id => document.getElementById(id);
-const EXOS = PARCOURS.flatMap((m, im) => m.exercices.map((e, ie) => ({ id: e.id, titre: e.titre, im, num: `${im + 1}.${ie + 1}` })));
-const IDX_EXO = Object.fromEntries(EXOS.map((e, i) => [e.id, i]));
-const NB = EXOS.length;
+/* Deux parcours suivis : Python (exercices.js) et Algorigrammes (algorigrammes.js). */
+const LES_PARCOURS = { python: { nom: "Python", liste: window.PARCOURS }, algo: { nom: "Algorigrammes", liste: window.PARCOURS_ALGO || [] } };
+let PARCOURS_ACTIF = "python";
+let EXOS = [], IDX_EXO = {}, NB = 0;
+function definirParcours(cle) {
+  PARCOURS_ACTIF = cle;
+  window.PARCOURS = LES_PARCOURS[cle].liste;
+  EXOS = PARCOURS.flatMap((m, im) => m.exercices.map((e, ie) => ({ id: e.id, titre: e.titre, im, num: `${im + 1}.${ie + 1}` })));
+  IDX_EXO = Object.fromEntries(EXOS.map((e, i) => [e.id, i]));
+  NB = EXOS.length;
+  const sous = document.getElementById("sous-progression");
+  if (sous) sous.textContent = `Nombre moyen d'exercices réussis par élève, jour après jour (sur ${NB}).`;
+  document.querySelectorAll("#choix-parcours .puce").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.parcours === cle)));
+}
+definirParcours("python");
 const JOUR = 86400000;
 const NOMS_ERREURS = {
   Sortie: "Affichage incorrect", Consigne: "Consigne non respectée", SyntaxError: "Erreur d'écriture",
   IndentationError: "Indentation", TabError: "Indentation", NameError: "Nom inconnu", TypeError: "Texte et nombre mélangés",
   ValueError: "Conversion impossible", Expire: "Boucle sans fin", SortieTropLongue: "Boucle sans fin",
-  EOFError: "Trop d'input()", ZeroDivisionError: "Division par zéro"
+  EOFError: "Trop d'input()", ZeroDivisionError: "Division par zéro", Reponse: "Mauvaise réponse"
 };
 const nomErreur = t => NOMS_ERREURS[t] || "Autre erreur";
 
@@ -1043,6 +1062,10 @@ $("b-csv").addEventListener("click", () => {
 
 /* ---------------- Démarrage ---------------- */
 matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { if (BRUT) toutDessiner(); });
+document.querySelectorAll("#choix-parcours .puce").forEach(b => b.addEventListener("click", () => {
+  definirParcours(b.dataset.parcours);
+  if (BRUT) toutDessiner();
+}));
 if (DEMO) { CLE = "demo"; ouvrir(); }
 else { CLE = store.lire("pyclasse:cle"); if (CLE) ouvrir(); }
 </script>
