@@ -294,7 +294,9 @@ const S = {
 };
 const cleLocale = () => `pyeval:${S.eleve.id}:${S.meta.id}`;
 const maintenant = () => Date.now() + S.decalage;
-function sauverLocal() { local.ecrire(cleLocale(), { reponses: S.reponses, file: S.file }); }
+// Les réponses sauvegardées sont marquées avec la version du sujet : si le sujet change,
+// les anciennes réponses sont ignorées au lieu d'apparaître dans les nouvelles questions.
+function sauverLocal() { local.ecrire(cleLocale(), { version: S.meta.iv, reponses: S.reponses, file: S.file }); }
 
 /* ---------- Réseau ---------- */
 async function appelGet(params) {
@@ -428,7 +430,10 @@ async function charger() {
     S.decalage = d.eval.maintenant - Date.now();
     S.debut = d.eval.debut;
     const l = local.lire(cleLocale(), {});
-    S.reponses = Object.assign({}, d.eval.reponses || {}, l.reponses || {});
+    const duServeur = d.eval.reponses && d.eval.reponses.version === S.meta.iv ? d.eval.reponses.reponses : {};
+    const enLocal = l.version === S.meta.iv ? (l.reponses || {}) : {};
+    S.reponses = Object.assign({}, duServeur, enLocal);
+    if (l.version !== S.meta.iv) l.file = [];
     S.file = l.file || [];
     S.reprise = !!S.debut;
     S.verrouille = !!d.eval.verrouille;
@@ -517,7 +522,7 @@ function demarrerEpreuve() {
   majSauve();
   envoyerFile();
   setInterval(tic, 1000);
-  setInterval(() => { if (S.modifie && !S.termine) { S.modifie = false; evenement("sauvegarde", S.reponses); } }, 30000);
+  setInterval(() => { if (S.modifie && !S.termine) { S.modifie = false; evenement("sauvegarde", { version: S.meta.iv, reponses: S.reponses }); } }, 30000);
   tic();
   if (S.verrouille) verrouiller(null, true);
   else if (S.reprise) incident("reprise", true);
