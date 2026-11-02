@@ -57,6 +57,8 @@ a { color: inherit; }
 .champ input { border: 1.5px solid var(--trait); border-radius: 8px; padding: .65rem .8rem; background: var(--fond); font-family: var(--f-code); }
 .champ input:focus { border-color: var(--accent); outline: none; }
 .erreur-connexion { color: var(--ko); background: var(--ko-doux); border-radius: 8px; padding: .6rem .8rem; font-size: .95rem; }
+.info-oubli { background: var(--surligne-doux); border-radius: 8px; padding: .6rem .8rem; font-size: .92rem; }
+#b-oubli { justify-self: center; font-size: .92rem; text-decoration: underline; }
 .bandeau-demo { background: var(--surligne-doux); border-radius: 8px; padding: .6rem .8rem; font-size: .9rem; }
 
 /* Accueil */
@@ -130,6 +132,8 @@ main { max-width: 1040px; margin: 0 auto; padding: 1.8rem 16px 4rem; display: gr
     </div>
     <div class="erreur-connexion" id="erreur-connexion" hidden></div>
     <button class="bouton plein" type="submit" id="b-connexion">Se connecter</button>
+    <button class="bouton discret" type="button" id="b-oubli">J'ai oublié mon code</button>
+    <div class="info-oubli" id="info-oubli" hidden></div>
   </form>
 </section>
 
@@ -286,6 +290,24 @@ function initConnexion() {
   $("bandeau-demo").hidden = !DEMO;
   $("champ-code").hidden = DEMO;
   $("c-code").required = !DEMO;
+  $("b-oubli").hidden = DEMO;
+  $("b-oubli").addEventListener("click", async () => {
+    const id = $("c-id").value.trim().toLowerCase();
+    const info = $("info-oubli");
+    info.hidden = false;
+    if (!id) { info.textContent = "Tape d'abord ton identifiant dans la case « Identifiant », puis clique à nouveau ici."; $("c-id").focus(); return; }
+    $("b-oubli").disabled = true;
+    info.textContent = "Envoi en cours…";
+    try {
+      const d = await appelGet({ action: "codeOublie", id });
+      if (d.attendre) info.textContent = "Un mail t'a déjà été envoyé il y a moins de 10 minutes. Regarde ta boîte mail de l'école (Outlook), y compris le dossier « Courrier indésirable ».";
+      else if (d.indice) info.textContent = "C'est envoyé ! Ouvre ta boîte mail de l'école (" + d.indice + ") dans Outlook ou Teams. Pense à regarder le dossier « Courrier indésirable ».";
+      else info.textContent = "Si cet identifiant est correct, un mail est parti vers ta boîte de l'école. Sinon, vérifie ton identifiant (par exemple : naitzaid) ou demande à ton professeur.";
+    } catch {
+      info.textContent = "Envoi impossible pour l'instant. Vérifie la connexion Internet et réessaie.";
+    }
+    $("b-oubli").disabled = false;
+  });
   const msg = local.lire("pyclasse:message", null);
   if (msg) { local.suppr("pyclasse:message"); $("erreur-connexion").textContent = msg; $("erreur-connexion").hidden = false; }
   const session = local.lire("pyclasse:session", null);
