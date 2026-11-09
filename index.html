@@ -81,6 +81,12 @@ main { max-width: 1040px; margin: 0 auto; padding: 1.8rem 16px 4rem; display: gr
 .carte { background: var(--papier); border: 1px solid var(--trait); border-radius: 14px; padding: 1.3rem 1.3rem 1.2rem; display: grid; gap: .9rem; align-content: start; border-top: 6px solid var(--accent); }
 .carte.algo { border-top-color: var(--algo); }
 .carte.evals { border-top-color: var(--surligne); }
+.mission { margin-top: 1rem; border-top-color: #8a4fd1; grid-template-columns: auto 1fr auto; align-items: center; gap: 1rem 1.3rem; }
+.mission .gros { font-size: 2.6rem; line-height: 1; }
+.mission .boutons { justify-content: flex-end; }
+.mission.ferme { opacity: .9; }
+.mission .etat-m { font-size: .9rem; color: var(--doux); }
+@media (max-width: 700px) { .mission { grid-template-columns: auto 1fr; } .mission .boutons { grid-column: 1 / -1; justify-content: flex-start; } }
 .carte .etape { font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; font-weight: 700; color: var(--doux); }
 .carte h2 { font-size: 1.55rem; font-weight: 800; display: flex; align-items: center; gap: .55rem; }
 .carte p { margin: 0; color: var(--doux); }
@@ -196,6 +202,17 @@ main { max-width: 1040px; margin: 0 auto; padding: 1.8rem 16px 4rem; display: gr
       </section>
     </div>
 
+    <section class="carte mission ferme" id="carte-mission">
+      <div class="gros" id="mission-icone">🔒</div>
+      <div>
+        <div class="etape">Étape 3 · Défi final</div>
+        <h2>Mission finale : escape game</h2>
+        <p>6 verrous à ouvrir en reprenant tout ce que tu as appris, puis ton bilan de compétences avant l'évaluation.</p>
+        <p class="etat-m" id="mission-etat">Se débloque quand tu as réussi tous les algorigrammes et tous les exercices Python.</p>
+      </div>
+      <div class="boutons"><a class="bouton" id="mission-lien" href="mission.html">Voir la mission</a></div>
+    </section>
+
     <section class="bloc-cours">
       <div>
         <h2>📖 Les cours</h2>
@@ -239,6 +256,16 @@ function majProgression(session) {
   $("texte-python").textContent = `${py.size} / ${IDS_PY.size} réussis`;
   $("jauge-algo").style.width = (100 * al.size / IDS_ALGO.size) + "%";
   $("texte-algo").textContent = `${al.size} / ${IDS_ALGO.size} réussis`;
+  const ouverte = (py.size === IDS_PY.size && al.size === IDS_ALGO.size) || session.id === "testprof";
+  const m = local.lire("pymission:" + session.id, {});
+  const salles = new Set([...(m.reussis || []), ...reussisServeur].filter(x => /^x\de\d$/.test(x))).size;
+  $("carte-mission").classList.toggle("ferme", !ouverte);
+  $("mission-icone").textContent = !ouverte ? "🔒" : salles >= 6 ? "🏆" : "🔓";
+  $("mission-lien").className = ouverte ? "bouton plein" : "bouton";
+  $("mission-lien").textContent = !ouverte ? "Voir la mission" : salles >= 6 ? "Mon bilan" : salles ? "Continuer la mission" : "Commencer la mission";
+  $("mission-etat").textContent = !ouverte
+    ? `Se débloque quand tu as réussi tous les algorigrammes et tous les exercices Python. Il te reste ${IDS_ALGO.size - al.size + IDS_PY.size - py.size} exercice(s).`
+    : `Débloquée ! ${salles} / 6 verrous ouverts.`;
 }
 
 function etatEval(html, classe) {

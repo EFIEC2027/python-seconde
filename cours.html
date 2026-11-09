@@ -153,7 +153,11 @@ function afficher(nom) {
     lec.appendChild(s);
   });
 }
-function depuisAdresse() { afficher(location.hash.replace("#", "").split("-")[0]); }
+function depuisAdresse() {
+  afficher(location.hash.replace("#", "").split("-")[0]);
+  const cible = location.hash.length > 1 && document.getElementById(location.hash.slice(1));
+  if (cible && cible.classList.contains("lecon")) setTimeout(() => cible.scrollIntoView(), 0);
+}
 ["algo", "python"].forEach(n => $("o-" + n).addEventListener("click", () => { history.replaceState(null, "", "#" + n); afficher(n); window.scrollTo(0, 0); }));
 window.addEventListener("hashchange", depuisAdresse);
 depuisAdresse();

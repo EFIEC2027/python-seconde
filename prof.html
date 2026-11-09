@@ -182,6 +182,7 @@ select#choix-eleve { border: 1.5px solid var(--trait); border-radius: 8px; paddi
       <div class="filtres" id="choix-parcours" role="group" aria-label="Parcours">
         <button type="button" class="puce" data-parcours="python" aria-pressed="true">Python</button>
         <button type="button" class="puce" data-parcours="algo" aria-pressed="false">Algorigrammes</button>
+        <button type="button" class="puce" data-parcours="mission" aria-pressed="false">Mission finale</button>
       </div>
       <div class="filtres" id="filtres" role="group" aria-label="Classe"></div>
       <div class="droite">
@@ -324,13 +325,14 @@ select#choix-eleve { border: 1.5px solid var(--trait); border-radius: 8px; paddi
 <script src="evaluations.js?v=20261014c"></script>
 <script>window.PARCOURS_PYTHON = window.PARCOURS;</script>
 <script src="algorigrammes.js?v=20261014c"></script>
+<script src="mission.js?v=20261109a"></script>
 <script>
 "use strict";
 const URL_SERVEUR = (window.CONFIG && CONFIG.url || "").trim();
 const DEMO = !URL_SERVEUR;
 const $ = id => document.getElementById(id);
 /* Deux parcours suivis : Python (exercices.js) et Algorigrammes (algorigrammes.js). */
-const LES_PARCOURS = { python: { nom: "Python", liste: window.PARCOURS }, algo: { nom: "Algorigrammes", liste: window.PARCOURS_ALGO || [] } };
+const LES_PARCOURS = { python: { nom: "Python", liste: window.PARCOURS }, algo: { nom: "Algorigrammes", liste: window.PARCOURS_ALGO || [] }, mission: { nom: "Mission finale", liste: window.PARCOURS_MISSION || [] } };
 let PARCOURS_ACTIF = "python";
 let EXOS = [], IDX_EXO = {}, NB = 0;
 function definirParcours(cle) {
