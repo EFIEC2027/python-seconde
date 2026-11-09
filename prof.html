@@ -182,7 +182,6 @@ select#choix-eleve { border: 1.5px solid var(--trait); border-radius: 8px; paddi
       <div class="filtres" id="choix-parcours" role="group" aria-label="Parcours">
         <button type="button" class="puce" data-parcours="python" aria-pressed="true">Python</button>
         <button type="button" class="puce" data-parcours="algo" aria-pressed="false">Algorigrammes</button>
-        <button type="button" class="puce" data-parcours="mission" aria-pressed="false">Mission finale</button>
       </div>
       <div class="filtres" id="filtres" role="group" aria-label="Classe"></div>
       <div class="droite">
@@ -322,17 +321,16 @@ select#choix-eleve { border: 1.5px solid var(--trait); border-radius: 8px; paddi
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="config.js?v=20261014c"></script>
 <script src="exercices.js?v=20261014c"></script>
-<script src="evaluations.js?v=20261014c"></script>
+<script src="evaluations.js?v=20261109b"></script>
 <script>window.PARCOURS_PYTHON = window.PARCOURS;</script>
 <script src="algorigrammes.js?v=20261014c"></script>
-<script src="mission.js?v=20261109a"></script>
 <script>
 "use strict";
 const URL_SERVEUR = (window.CONFIG && CONFIG.url || "").trim();
 const DEMO = !URL_SERVEUR;
 const $ = id => document.getElementById(id);
 /* Deux parcours suivis : Python (exercices.js) et Algorigrammes (algorigrammes.js). */
-const LES_PARCOURS = { python: { nom: "Python", liste: window.PARCOURS }, algo: { nom: "Algorigrammes", liste: window.PARCOURS_ALGO || [] }, mission: { nom: "Mission finale", liste: window.PARCOURS_MISSION || [] } };
+const LES_PARCOURS = { python: { nom: "Python", liste: window.PARCOURS }, algo: { nom: "Algorigrammes", liste: window.PARCOURS_ALGO || [] } };
 let PARCOURS_ACTIF = "python";
 let EXOS = [], IDX_EXO = {}, NB = 0;
 function definirParcours(cle) {
@@ -1008,13 +1006,23 @@ function dessinerDetailEval(etats, meta) {
   const zr = $("evd-reponses");
   zr.innerHTML = "";
   if (!x.rendu) { const p = document.createElement("p"); p.className = "vide"; p.textContent = "Les réponses apparaîtront ici quand la copie sera rendue."; zr.appendChild(p); return; }
+  if (x.rendu.bilan) {
+    const NOMS_C = { c1: "Lire un algorigramme", c2: "Traduire un algorigramme en Python", c3: "Calculs (+ − * / // %)", c4: "Variables et affectation", c5: "input et conversion", c6: "Conditions (if, elif, else, and, or)", c7: "Boucle for", c8: "Boucle while", c9: "Fonctions (def, return)", c10: "Corriger ses erreurs" };
+    const LIB = { acquis: "Acquis", encours: "En cours", travail: "À travailler" };
+    const art = document.createElement("article");
+    art.className = "rep-question";
+    art.innerHTML = "<header><strong>Bilan de compétences</strong><span></span></header><pre></pre>";
+    art.querySelector("pre").textContent = Object.entries(x.rendu.bilan).map(([c, b]) => `${(LIB[b.niveau] || b.niveau).padEnd(13)} ${NOMS_C[c] || c}`).join("\n");
+    zr.appendChild(art);
+  }
   (x.rendu.details || []).map((d, i) => ({ d, i, q: d.q || i + 1 })).sort((a, b) => a.q - b.q).forEach(({ d, i: k, q }) => {
     const art = document.createElement("article");
     art.className = "rep-question" + (d.points === d.max ? " plein" : d.points === 0 ? " zero" : "");
     art.innerHTML = "<header><strong></strong><span></span><span class=\"pts\"></span></header><pre></pre>";
     art.querySelector("strong").textContent = `Question ${q}` + (d.v ? ` (version ${d.v})` : "");
     const infos = [];
-    if (d.tests) infos.push(`tests réussis : ${d.tests}`);
+    if (d.essais !== undefined) { infos.push(d.niveau || ""); infos.push(`${d.essais} tentative(s)` + (d.indices ? `, ${d.indices} indice(s)` : "")); if (d.tests) infos.push(d.tests); }
+    else if (d.tests) infos.push(`tests réussis : ${d.tests}`);
     if (d.juste !== undefined) infos.push(d.juste ? "réponse juste" : "réponse fausse");
     if (d.regles && d.regles.length) infos.push("consigne non respectée : " + d.regles.join(" "));
     if (d.erreur) infos.push("erreur : " + (typeof nomErreur === "function" ? nomErreur(d.erreur) : d.erreur));

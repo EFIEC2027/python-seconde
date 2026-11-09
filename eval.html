@@ -291,7 +291,7 @@ pre.programme { font-size: 1rem; line-height: 1.6; }
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
 <script src="config.js?v=20261014c"></script>
-<script src="evaluations.js?v=20261014c"></script>
+<script src="evaluations.js?v=20261109b"></script>
 <script src="verif.js?v=20261014c"></script>
 <script src="schema.js?v=20261014c"></script>
 <script>
@@ -445,6 +445,7 @@ async function charger() {
     if (!d.eval) return info("Pas d'évaluation en cours", `Bonjour ${d.prenom}. Ton professeur n'a pas encore ouvert l'évaluation. Attends son signal, puis clique sur Réessayer.`);
     S.meta = (window.EVALUATIONS || []).find(e => e.id === d.eval.id);
     if (!S.meta) return info("Page à mettre à jour", "Cette évaluation n'est pas encore sur le site. Préviens ton professeur.");
+    if (S.meta.mode === "mission") { location.href = "mission.html"; return; }
     if (d.eval.rendu) return info("Copie déjà rendue", d.eval.note !== undefined && d.eval.note !== null ? `Tu as déjà rendu ta copie. Ta note : ${virgule(d.eval.note)} / 20.` : "Tu as déjà rendu ta copie pour cette évaluation.");
     S.questions = tirerQuestions(await dechiffrer(S.meta, d.eval.cle));
     S.decalage = d.eval.maintenant - Date.now();

@@ -3,249 +3,152 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
 <title>Mission finale</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
 <style>
-/* Mise en page : barre du haut, parcours à gauche, exercice à droite ; le parcours passe en bandeau sur téléphone. */
+/* Mise en page : écran de connexion, consignes, puis épreuve plein écran (questions à gauche, question à droite). */
 :root {
-  --fond: #eef3f2; --papier: #ffffff; --encre: #13232b; --doux: #56686f; --trait: #d3dfe0;
-  --accent: #0d6a6a; --accent-fort: #0a5252; --surligne: #f2c230; --surligne-doux: #fbf0c8;
-  --ok: #1d8049; --ok-doux: #dcf1e4; --ko: #b93d2a; --ko-doux: #f8e1dc; --code-fond: #f7faf9;
+  --fond: #eef1f4; --papier: #ffffff; --encre: #16202c; --doux: #596779; --trait: #d3dae3;
+  --accent: #2b4c8c; --accent-fort: #1f3a6e; --surligne: #f2c230; --surligne-doux: #fbf0c8;
+  --ok: #1d8049; --ok-doux: #dcf1e4; --ko: #b93d2a; --ko-doux: #f8e1dc; --code-fond: #f7f9fb;
   --f-titre: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
   --f-texte: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
-  --f-code: "JetBrains Mono", ui-monospace, "Cascadia Code", Consolas, monospace;
-  --rayon: 10px;
-  --sch-ovale: #dcefe9; --sch-losange: #e8eef9; --sch-losange-trait: #2b4c8c; --sch-es-trait: #a86a00;
+  --f-code: "JetBrains Mono", ui-monospace, Consolas, monospace;
   color-scheme: light;
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --fond: #0e171a; --papier: #152126; --encre: #e3ecec; --doux: #93a5aa; --trait: #2a3b41;
-    --accent: #4db3ab; --accent-fort: #7ccbc4; --surligne: #f0c645; --surligne-doux: #3b3420;
-    --ok: #52c483; --ok-doux: #173326; --ko: #f07b63; --ko-doux: #3a211c; --code-fond: #111b1f;
-    --sch-ovale: #173330; --sch-losange: #1b2740; --sch-losange-trait: #8aa8e6; --sch-es-trait: #f0c645;
-    color-scheme: dark;
-  }
 }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 html, body { height: 100%; }
 body { margin: 0; background: var(--fond); color: var(--encre); font: 16px/1.55 var(--f-texte); }
-button, input, textarea, select { font: inherit; color: inherit; }
-code, pre { font-family: var(--f-code); font-size: .9em; }
+button, input, textarea { font: inherit; color: inherit; }
+code, pre { font-family: var(--f-code); font-size: .92em; }
 :focus-visible { outline: 3px solid var(--surligne); outline-offset: 2px; }
-h1, h2, h3 { font-family: var(--f-titre); text-wrap: balance; line-height: 1.15; margin: 0; }
-
-.bouton { border: 1.5px solid var(--trait); background: var(--papier); border-radius: 8px; padding: .55rem 1rem; cursor: pointer; font-weight: 700; display: inline-flex; gap: .45rem; align-items: center; }
+h1, h2 { font-family: var(--f-titre); line-height: 1.15; margin: 0; text-wrap: balance; }
+.bouton { border: 1.5px solid var(--trait); background: var(--papier); border-radius: 8px; padding: .55rem 1rem; cursor: pointer; font-weight: 700; }
 .bouton:hover:not(:disabled) { border-color: var(--accent); }
 .bouton:disabled { opacity: .5; cursor: progress; }
-.bouton.plein { background: var(--accent); border-color: var(--accent); color: var(--papier); }
-.bouton.plein:hover:not(:disabled) { background: var(--accent-fort); border-color: var(--accent-fort); }
-.bouton.discret { border-color: transparent; background: transparent; color: var(--doux); padding-inline: .6rem; }
-.bouton.discret:hover { color: var(--encre); }
-kbd { font-family: var(--f-code); font-size: .75em; border: 1px solid currentColor; border-radius: 4px; padding: 0 .3em; opacity: .7; font-weight: 400; }
+.bouton.plein { background: var(--accent); border-color: var(--accent); color: #fff; }
+.bouton.plein:hover:not(:disabled) { background: var(--accent-fort); }
+.bouton.danger { background: var(--ko); border-color: var(--ko); color: #fff; }
 
-/* ---------- Connexion ---------- */
-#ecran-connexion { min-height: 100%; display: grid; place-items: center; padding: 2rem 16px; }
-.carte-connexion { width: min(420px, 100%); background: var(--papier); border: 1px solid var(--trait); border-radius: 16px; padding: 2rem 1.75rem; display: grid; gap: 1.1rem; }
-.carte-connexion h1 { font-size: 2rem; font-weight: 800; }
-.carte-connexion h1 span { background: linear-gradient(transparent 60%, var(--surligne) 60%); padding-inline: .1em; }
-.carte-connexion p { margin: 0; color: var(--doux); }
+.centre { min-height: 100%; display: grid; place-items: center; padding: 2rem 16px; }
+.carte { width: min(560px, 100%); background: var(--papier); border: 1px solid var(--trait); border-radius: 16px; padding: 2rem 1.75rem; display: grid; gap: 1rem; }
+.carte h1 { font-size: 1.9rem; font-weight: 800; }
+.carte p { margin: 0; }
+.doux { color: var(--doux); }
+.surtitre { font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; color: var(--accent); font-weight: 700; margin: 0; }
 .champ { display: grid; gap: .3rem; }
 .champ label { font-weight: 700; font-size: .95rem; }
 .champ input { border: 1.5px solid var(--trait); border-radius: 8px; padding: .65rem .8rem; background: var(--fond); font-family: var(--f-code); }
-.champ input:focus { border-color: var(--accent); outline: none; }
-.erreur-connexion { color: var(--ko); background: var(--ko-doux); border-radius: 8px; padding: .6rem .8rem; font-size: .95rem; }
-.bandeau-demo { background: var(--surligne-doux); border-radius: 8px; padding: .6rem .8rem; font-size: .9rem; }
+.erreur { color: var(--ko); background: var(--ko-doux); border-radius: 8px; padding: .6rem .8rem; }
+.regles { margin: 0; padding-left: 1.2rem; display: grid; gap: .35rem; }
+.regles strong { color: var(--ko); }
+.fiche { display: grid; grid-template-columns: auto 1fr; gap: .2rem 1rem; background: var(--fond); border-radius: 10px; padding: .8rem 1rem; }
+.fiche dt { color: var(--doux); }
+.fiche dd { margin: 0; font-weight: 700; font-variant-numeric: tabular-nums; }
 
-/* ---------- Application ---------- */
-#app { height: 100%; display: grid; grid-template-rows: auto 1fr; }
-.barre { display: flex; align-items: center; gap: 1rem; padding: .6rem 16px; background: var(--papier); border-bottom: 1px solid var(--trait); flex-wrap: wrap; }
-.barre .marque { font-family: var(--f-titre); font-weight: 800; font-size: 1.15rem; }
-.barre .marque span { color: var(--accent); }
-.jauge { display: flex; align-items: center; gap: .6rem; flex: 1; min-width: 160px; max-width: 360px; font-size: .9rem; color: var(--doux); font-variant-numeric: tabular-nums; }
-.jauge .piste { flex: 1; height: 8px; background: var(--trait); border-radius: 99px; overflow: hidden; }
-.jauge .rempli { height: 100%; background: var(--accent); border-radius: 99px; transition: width .4s; }
-.statut { font-size: .85rem; color: var(--doux); display: flex; align-items: center; gap: .4rem; }
-.statut::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--ok); }
-.statut.attente::before { background: var(--surligne); }
-.statut.demo::before { background: var(--doux); }
-.eleve { margin-left: auto; display: flex; align-items: center; gap: .5rem; font-weight: 700; }
-.eleve small { font-weight: 400; color: var(--doux); }
-.lien-parcours { font-size: .9rem; }
-.onglets-haut { display: flex; gap: .4rem; }
-.onglets-haut a { font-weight: 700; font-size: .9rem; color: var(--accent); text-decoration: none; border: 1.5px solid var(--trait); border-radius: 8px; padding: .35rem .7rem; background: var(--fond); white-space: nowrap; }
-.onglets-haut a:hover { border-color: var(--accent); }
-
-.corps { display: grid; grid-template-columns: 250px minmax(0, 1fr); min-height: 0; }
-#parcours { background: var(--papier); border-right: 1px solid var(--trait); overflow-y: auto; padding: 1rem .75rem 2rem; display: grid; gap: 1rem; align-content: start; }
-.module h2 { font-size: .95rem; font-weight: 600; display: flex; justify-content: space-between; gap: .5rem; padding-inline: .35rem; }
-.module h2 small { font-family: var(--f-texte); font-weight: 400; color: var(--doux); font-variant-numeric: tabular-nums; }
-.module .notion { font-size: .8rem; color: var(--doux); padding-inline: .35rem; margin: .1rem 0 .45rem; }
-.pastilles { display: grid; grid-template-columns: repeat(4, 1fr); gap: .35rem; }
-.pastille { border: 1.5px solid var(--trait); background: var(--fond); border-radius: 8px; padding: .35rem 0; cursor: pointer; font-family: var(--f-code); font-size: .8rem; font-variant-numeric: tabular-nums; text-align: center; }
-.pastille:hover { border-color: var(--accent); }
-.pastille.tente { border-color: var(--surligne); background: var(--surligne-doux); }
-.pastille.reussi { border-color: var(--ok); background: var(--ok-doux); color: var(--ok); font-weight: 600; }
-.pastille.actif { outline: 2.5px solid var(--accent); outline-offset: 1px; }
-
-#exo { overflow-y: auto; padding: 1.5rem 16px 4rem; }
-.exo-contenu { max-width: 860px; margin-inline: auto; display: grid; gap: 1.1rem; }
-.exo-tete { display: flex; justify-content: space-between; align-items: end; gap: 1rem; flex-wrap: wrap; }
-.surtitre { font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; color: var(--accent); font-weight: 700; margin: 0 0 .25rem; }
-.exo-tete h1 { font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 800; }
-.exo-tete h1 .num { font-family: var(--f-code); font-weight: 400; color: var(--doux); font-size: .65em; margin-right: .4rem; vertical-align: .15em; }
-
-details.cours { background: var(--papier); border: 1px solid var(--trait); border-radius: var(--rayon); }
-details.cours summary { cursor: pointer; padding: .7rem 1rem; font-weight: 700; list-style: none; display: flex; justify-content: space-between; }
-details.cours summary::after { content: "Afficher"; font-weight: 400; color: var(--accent); font-size: .9rem; }
-details.cours[open] summary::after { content: "Masquer"; }
-details.cours summary::-webkit-details-marker { display: none; }
-.cours-texte { padding: 0 1rem 1rem; max-width: 68ch; }
-.cours-texte p { margin: .5rem 0; }
-.cours-texte pre, .enonce pre { background: var(--code-fond); border: 1px solid var(--trait); border-radius: 8px; padding: .6rem .8rem; overflow-x: auto; margin: .5rem 0; }
-.cours-texte pre.sortie, .enonce pre.sortie { border-style: dashed; color: var(--doux); }
-.cours-texte table.ops { border-collapse: collapse; margin: .5rem 0; }
-.cours-texte table.ops td { padding: .25rem .8rem .25rem 0; vertical-align: top; }
-:not(pre) > code { background: var(--surligne-doux); padding: .05em .3em; border-radius: 4px; }
-
-.enonce { font-size: 1.08rem; max-width: 70ch; }
+/* Épreuve */
+#epreuve { height: 100%; display: grid; grid-template-rows: auto 1fr; }
+.barre { display: flex; align-items: center; gap: 1rem; padding: .6rem 16px; background: var(--encre); color: #fff; flex-wrap: wrap; }
+.barre .titre { font-family: var(--f-titre); font-weight: 600; flex: 1; min-width: 0; }
+.barre .titre small { font-family: var(--f-texte); font-weight: 400; opacity: .7; margin-left: .5rem; }
+.chrono { font-family: var(--f-code); font-size: 1.25rem; font-weight: 600; font-variant-numeric: tabular-nums; padding: .15rem .7rem; border-radius: 6px; background: rgba(255,255,255,.12); }
+.chrono.bientot { background: var(--surligne); color: var(--encre); }
+.sauve { font-size: .85rem; opacity: .8; }
+.corps { display: grid; grid-template-columns: 220px minmax(0, 1fr); min-height: 0; }
+#liste { background: var(--papier); border-right: 1px solid var(--trait); padding: 1rem .75rem; display: grid; gap: .4rem; align-content: start; overflow-y: auto; }
+.q-bouton { display: flex; justify-content: space-between; gap: .5rem; text-align: left; border: 1.5px solid var(--trait); background: var(--fond); border-radius: 8px; padding: .5rem .7rem; cursor: pointer; }
+.q-bouton small { color: var(--doux); font-variant-numeric: tabular-nums; }
+.q-bouton.repondu { border-color: var(--accent); }
+.q-bouton.repondu::after { content: "✓"; color: var(--accent); font-weight: 800; }
+.q-bouton.actif { background: var(--accent); border-color: var(--accent); color: #fff; }
+.q-bouton.actif small, .q-bouton.actif::after { color: #fff; }
+#liste .bouton { margin-top: 1rem; }
+#question { overflow-y: auto; padding: 1.5rem 16px 4rem; }
+.q-contenu { max-width: 860px; margin-inline: auto; display: grid; gap: 1rem; }
+.q-contenu h1 { font-size: 1.6rem; font-weight: 800; }
+.q-contenu h1 small { font-family: var(--f-texte); font-weight: 400; font-size: .55em; color: var(--doux); margin-left: .4rem; }
+.enonce { max-width: 72ch; font-size: 1.05rem; }
 .enonce p { margin: .4rem 0; }
-
-.editeur { border: 1.5px solid var(--trait); border-radius: var(--rayon); overflow: hidden; background: var(--code-fond); }
-.editeur:focus-within { border-color: var(--accent); }
-.editeur-tete { display: flex; justify-content: space-between; align-items: center; padding: .35rem .5rem .35rem .9rem; border-bottom: 1px solid var(--trait); font-size: .85rem; color: var(--doux); background: var(--papier); }
-.CodeMirror { height: auto; min-height: 220px; font-family: var(--f-code); font-size: 15px; line-height: 1.6; background: var(--code-fond); color: var(--encre); }
-.CodeMirror-scroll { min-height: 220px; }
-.CodeMirror-gutters { background: var(--code-fond); border-right: 1px solid var(--trait); }
-.CodeMirror-linenumber { color: var(--doux); }
-.CodeMirror-cursor { border-left: 2px solid var(--accent); }
-.CodeMirror-selected, .CodeMirror-focused .CodeMirror-selected { background: var(--surligne-doux) !important; }
-.cm-s-default .cm-keyword { color: var(--accent); font-weight: 600; }
-.cm-s-default .cm-builtin { color: #7a4fb0; }
-.cm-s-default .cm-string { color: #a4561c; }
-.cm-s-default .cm-number { color: #1d6fb8; }
-.cm-s-default .cm-comment { color: var(--doux); font-style: italic; }
-.cm-s-default .cm-def { color: var(--encre); font-weight: 600; }
-.cm-s-default .cm-variable, .cm-s-default .cm-variable-2, .cm-s-default .cm-property { color: var(--encre); }
-.cm-s-default .cm-operator { color: var(--doux); }
-@media (prefers-color-scheme: dark) {
-  .cm-s-default .cm-builtin { color: #c49af2; }
-  .cm-s-default .cm-string { color: #f0a46a; }
-  .cm-s-default .cm-number { color: #79b8f0; }
-}
-.ligne-erreur { background: var(--ko-doux); }
-
-.clavier { display: grid; gap: .3rem; }
-.clavier label { font-weight: 700; font-size: .95rem; }
-.clavier label small { font-weight: 400; color: var(--doux); }
-.clavier textarea { font-family: var(--f-code); border: 1.5px solid var(--trait); border-radius: 8px; padding: .5rem .7rem; background: var(--code-fond); min-height: 4.5rem; resize: vertical; }
-
-.actions { display: flex; gap: .6rem; flex-wrap: wrap; align-items: center; }
-.actions .espace { flex: 1; }
-
-.console { background: var(--papier); border: 1px solid var(--trait); border-radius: var(--rayon); }
-.console-tete { padding: .4rem .9rem; border-bottom: 1px solid var(--trait); font-size: .85rem; color: var(--doux); }
-.console pre { margin: 0; padding: .7rem .9rem; min-height: 3rem; white-space: pre-wrap; word-break: break-word; max-height: 320px; overflow-y: auto; }
-.console pre.vide { color: var(--doux); font-family: var(--f-texte); font-style: italic; }
-.message { margin: 0 .9rem .8rem; padding: .7rem .9rem; border-radius: 8px; background: var(--ko-doux); }
-.message strong { color: var(--ko); }
-.message .brut { display: block; font-family: var(--f-code); font-size: .78rem; color: var(--doux); margin-top: .3rem; }
-
-.indice { background: var(--surligne-doux); border-radius: 8px; padding: .7rem .9rem; }
-.indice b { font-family: var(--f-titre); }
-.indice pre { margin: .3rem 0 0; white-space: pre-wrap; }
-
-.verdict { border-radius: var(--rayon); padding: 1rem 1.1rem; display: grid; gap: .8rem; }
-.verdict.reussi { background: var(--ok-doux); border: 1.5px solid var(--ok); }
-.verdict.rate { background: var(--papier); border: 1.5px solid var(--ko); }
-.verdict h2 { font-size: 1.25rem; }
-.verdict.reussi h2 { color: var(--ok); }
-.verdict.rate h2 { color: var(--ko); }
-.verdict ul.regles { margin: 0; padding-left: 1.2rem; }
-.tests { display: grid; gap: .5rem; }
-.test { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: .2rem .7rem; padding: .55rem .7rem; border-radius: 8px; background: var(--fond); font-size: .92rem; }
-.test .icone { font-weight: 800; font-family: var(--f-code); }
-.test.ok .icone { color: var(--ok); }
-.test.ko .icone { color: var(--ko); }
-.test .detail { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: .4rem .8rem; grid-column: 2; }
-.test .detail div { min-width: 0; }
-.test .detail span { font-size: .75rem; text-transform: uppercase; letter-spacing: .06em; color: var(--doux); }
-.test .detail pre { margin: .1rem 0 0; white-space: pre-wrap; word-break: break-word; font-size: .85rem; }
-
-.chargement { display: inline-flex; gap: .5rem; align-items: center; color: var(--doux); font-size: .9rem; }
-.chargement::before { content: ""; width: 14px; height: 14px; border: 2px solid var(--trait); border-top-color: var(--accent); border-radius: 50%; animation: tourne .8s linear infinite; }
-@keyframes tourne { to { transform: rotate(360deg); } }
-@media (prefers-reduced-motion: reduce) { .chargement::before { animation: none; } .jauge .rempli { transition: none; } }
-
-@media (max-width: 820px) {
-  #app { height: auto; min-height: 100%; }
-  .corps { grid-template-columns: minmax(0, 1fr); }
-  #parcours { border-right: 0; border-bottom: 1px solid var(--trait); grid-auto-flow: column; grid-auto-columns: minmax(200px, 1fr); overflow-x: auto; overflow-y: hidden; padding: .8rem 16px; }
-  #exo { overflow: visible; }
-  .eleve { margin-left: 0; }
-}
-
-/* ---------- Mission finale ---------- */
-.schema-zone { background: var(--papier); border: 1px solid var(--trait); border-radius: var(--rayon); padding: .8rem; overflow-x: auto; display: flex; justify-content: center; }
+.enonce pre, pre.programme { background: var(--code-fond); border: 1px solid var(--trait); border-radius: 8px; padding: .7rem .9rem; overflow-x: auto; margin: .5rem 0; }
+.enonce pre.sortie { border-style: dashed; color: var(--doux); }
+pre.programme { font-size: 1rem; line-height: 1.6; }
+:not(pre) > code { background: var(--surligne-doux); padding: .05em .3em; border-radius: 4px; }
+.qcm { display: grid; gap: .5rem; }
+.schema-zone { background: var(--papier); border: 1px solid var(--trait); border-radius: 10px; padding: .8rem; overflow-x: auto; display: flex; justify-content: center; }
+.cor-schema { grid-column: 1 / -1; }
 .schema { max-width: 100%; height: auto; }
 .schema text { font: 14px var(--f-texte); dominant-baseline: central; text-anchor: middle; fill: var(--encre); }
 .schema .sch-etiquette { font-size: 12px; font-weight: 700; fill: var(--doux); dominant-baseline: auto; }
-.sch-debut, .sch-fin { fill: var(--sch-ovale); stroke: var(--accent); stroke-width: 1.5; }
+.sch-debut, .sch-fin { fill: #dcefe9; stroke: #0d6a6a; stroke-width: 1.5; }
 .sch-action { fill: var(--papier); stroke: var(--encre); stroke-width: 1.5; }
-.sch-es { fill: var(--surligne-doux); stroke: var(--sch-es-trait); stroke-width: 1.5; }
-.sch-si { fill: var(--sch-losange); stroke: var(--sch-losange-trait); stroke-width: 1.5; }
+.sch-es { fill: var(--surligne-doux); stroke: #a86a00; stroke-width: 1.5; }
+.sch-si { fill: #e8eef9; stroke: var(--accent); stroke-width: 1.5; }
 .sch-fleche, .sch-trait { fill: none; stroke: var(--doux); stroke-width: 1.5; }
 .sch-pointe { fill: var(--doux); }
-.histoire { background: var(--surligne-doux); border-left: 4px solid var(--surligne); padding: .6rem .8rem; border-radius: 0 8px 8px 0; }
-.mot { display: flex; gap: .3rem; justify-content: center; margin: .2rem 0 .4rem; }
-.mot span { width: 2rem; height: 2.4rem; display: grid; place-items: center; border: 2px dashed var(--trait); border-radius: 6px; font: 800 1.25rem var(--f-titre); color: var(--doux); }
-.mot span.gagne { border-style: solid; border-color: var(--ok); background: var(--ok-doux); color: var(--ok); }
-.mot-legende { text-align: center; font-size: .8rem; color: var(--doux); margin: 0; }
-.salles { display: grid; gap: .4rem; }
-.salle { display: flex; align-items: center; gap: .6rem; text-align: left; border: 1.5px solid var(--trait); background: var(--fond); border-radius: 10px; padding: .5rem .7rem; cursor: pointer; }
-.salle:hover:not(:disabled) { border-color: var(--accent); }
-.salle .ic { font-size: 1.2rem; width: 1.6rem; text-align: center; }
-.salle b { display: block; font-size: .95rem; }
-.salle small { color: var(--doux); font-size: .78rem; line-height: 1.25; display: block; }
-.salle.tente { border-color: var(--surligne); background: var(--surligne-doux); }
-.salle.reussi { border-color: var(--ok); background: var(--ok-doux); }
-.salle.actif { outline: 2.5px solid var(--accent); outline-offset: 1px; }
-.salle:disabled { opacity: .55; cursor: not-allowed; }
-.salle.bilan { border-color: var(--accent); }
-.gain { font-weight: 700; color: var(--ok); margin: 0; }
-.panneau { padding: clamp(1rem, 3vw, 2rem); max-width: 900px; display: grid; gap: 1rem; align-content: start; }
-.panneau h1 { font-size: clamp(1.5rem, 3vw, 2.1rem); font-weight: 800; }
-.verrou-boite { background: var(--papier); border: 1px solid var(--trait); border-radius: 14px; padding: 1.2rem 1.3rem; display: grid; gap: .8rem; }
-.ligne-prog { display: grid; grid-template-columns: 9rem 1fr auto; gap: .7rem; align-items: center; }
-.piste-l { height: 10px; background: var(--fond); border: 1px solid var(--trait); border-radius: 99px; overflow: hidden; }
-.piste-l div { height: 100%; background: var(--accent); }
-.manque { font-size: .9rem; color: var(--doux); }
-.ligne-prog a { color: var(--accent); }
-table.bilan { width: 100%; border-collapse: collapse; background: var(--papier); border: 1px solid var(--trait); border-radius: 12px; overflow: hidden; font-size: .95rem; }
-.bilan th, .bilan td { padding: .55rem .7rem; border-bottom: 1px solid var(--trait); text-align: left; vertical-align: middle; }
-.bilan th { background: var(--fond); font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; color: var(--doux); }
-.bilan td.preuve { font-size: .85rem; color: var(--doux); white-space: nowrap; }
-.etiq { display: inline-block; border-radius: 99px; padding: .1rem .55rem; font-size: .8rem; font-weight: 700; white-space: nowrap; }
-.etiq.ok { background: var(--ok-doux); color: var(--ok); }
-.etiq.encours { background: var(--surligne-doux); color: #8a6300; }
-.auto-eval { display: flex; gap: .25rem; flex-wrap: wrap; }
-.auto-eval label { border: 1.5px solid var(--trait); border-radius: 99px; padding: .15rem .55rem; font-size: .82rem; cursor: pointer; white-space: nowrap; }
-.auto-eval input { position: absolute; opacity: 0; pointer-events: none; }
-.auto-eval input:checked + span { font-weight: 700; }
-.auto-eval label:has(input:checked) { border-color: var(--accent); background: var(--sch-ovale); }
-.auto-eval input:focus-visible + span { outline: 2px solid var(--surligne); }
-.a-revoir { background: var(--papier); border: 1.5px solid var(--surligne); border-radius: 12px; padding: .9rem 1.1rem; }
-.a-revoir h2 { font-size: 1.15rem; margin-bottom: .4rem; }
-.a-revoir ul { margin: 0; padding-left: 1.2rem; display: grid; gap: .3rem; }
-@media (max-width: 700px) { .bilan td.preuve, .bilan th.preuve { display: none; } .ligne-prog { grid-template-columns: 1fr auto; } .ligne-prog .piste-l { grid-column: 1 / -1; grid-row: 2; } }
-@media print {
-  .barre, #parcours, .no-print { display: none !important; }
-  body, .corps, #exo { display: block; height: auto; overflow: visible; background: #fff; }
-  .auto-eval label:not(:has(input:checked)) { display: none; }
+.choix { display: flex; align-items: center; gap: .7rem; padding: .7rem .9rem; border: 1.5px solid var(--trait); border-radius: 10px; background: var(--papier); cursor: pointer; }
+.choix:hover { border-color: var(--accent); }
+.choix.coche { border-color: var(--accent); background: #e8eef9; }
+.choix input { width: 1.1rem; height: 1.1rem; accent-color: var(--accent); }
+.choix code { background: none; padding: 0; font-size: 1rem; }
+.reponse-texte { display: grid; gap: .3rem; }
+.reponse-texte label { font-weight: 700; }
+.reponse-texte textarea { font-family: var(--f-code); border: 1.5px solid var(--trait); border-radius: 8px; padding: .6rem .8rem; min-height: 7rem; resize: vertical; background: var(--papier); }
+.editeur { border: 1.5px solid var(--trait); border-radius: 10px; overflow: hidden; }
+.editeur:focus-within { border-color: var(--accent); }
+.CodeMirror { height: auto; min-height: 200px; font-family: var(--f-code); font-size: 15px; line-height: 1.6; background: var(--code-fond); }
+.CodeMirror-scroll { min-height: 200px; }
+.CodeMirror :focus-visible { outline: none; }
+.CodeMirror-gutters { background: var(--code-fond); border-right: 1px solid var(--trait); }
+.cm-s-default .cm-keyword { color: var(--accent); font-weight: 600; }
+.cm-s-default .cm-string { color: #a4561c; }
+.cm-s-default .cm-number { color: #1d6fb8; }
+.cm-s-default .cm-comment { color: var(--doux); font-style: italic; }
+.actions { display: flex; gap: .6rem; flex-wrap: wrap; align-items: center; }
+.actions .espace { flex: 1; }
+.console { background: var(--papier); border: 1px solid var(--trait); border-radius: 10px; }
+.console-tete { padding: .4rem .9rem; border-bottom: 1px solid var(--trait); font-size: .85rem; color: var(--doux); }
+.console pre { margin: 0; padding: .7rem .9rem; min-height: 2.5rem; white-space: pre-wrap; word-break: break-word; max-height: 260px; overflow-y: auto; }
+.message { margin: 0 .9rem .8rem; padding: .6rem .8rem; border-radius: 8px; background: var(--ko-doux); }
+.chargement { display: inline-flex; gap: .5rem; align-items: center; color: var(--doux); font-size: .9rem; }
+.chargement::before { content: ""; width: 14px; height: 14px; border: 2px solid var(--trait); border-top-color: var(--accent); border-radius: 50%; animation: tourne .8s linear infinite; }
+@keyframes tourne { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .chargement::before { animation: none; } }
+
+/* Verrou et fenêtres */
+.voile { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 16px; background: rgba(22, 32, 44, .82); }
+#verrou { background: var(--ko); }
+#verrou .carte { border: 0; }
+#verrou h1 { color: var(--ko); }
+.grand { font-size: 1.1rem; }
+#ecran-fin { min-height: 100%; padding: 2rem 16px 4rem; }
+.fin { max-width: 860px; margin-inline: auto; display: grid; gap: 1rem; }
+.fin-tete { width: 100%; text-align: center; justify-items: center; }
+.note { font-family: var(--f-titre); font-size: 4rem; font-weight: 800; line-height: 1; color: var(--accent); font-variant-numeric: tabular-nums; }
+.note small { font-size: .4em; color: var(--doux); font-weight: 600; }
+.correction { display: grid; gap: .9rem; }
+.cor { background: var(--papier); border: 1px solid var(--trait); border-radius: 12px; overflow: hidden; }
+.cor header { display: flex; justify-content: space-between; gap: 1rem; padding: .6rem 1rem; border-left: 6px solid var(--doux); }
+.cor.plein header { border-left-color: var(--ok); background: var(--ok-doux); }
+.cor.zero header { border-left-color: var(--ko); background: var(--ko-doux); }
+.cor.partiel header { border-left-color: var(--surligne); background: var(--surligne-doux); }
+.cor .pts { font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.cor-corps { padding: .8rem 1rem 1rem; display: grid; gap: .6rem; grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); }
+.cor-bloc { min-width: 0; }
+.cor-bloc span { font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; color: var(--doux); font-weight: 700; }
+.cor-bloc pre { margin: .2rem 0 0; background: var(--code-fond); border: 1px solid var(--trait); border-radius: 8px; padding: .5rem .7rem; white-space: pre; overflow-x: auto; }
+.cor-bloc.bon pre { border-color: var(--ok); background: var(--ok-doux); }
+.cor-bloc.prog { grid-column: 1 / -1; }
+.cor-info { grid-column: 1 / -1; margin: 0; color: var(--doux); }
+@media (max-width: 760px) {
+  #epreuve { height: auto; min-height: 100%; }
+  .corps { grid-template-columns: minmax(0, 1fr); }
+  #liste { grid-auto-flow: column; grid-auto-columns: max-content; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--trait); padding: .6rem 16px; }
+  #liste .bouton { margin-top: 0; }
 }
 </style>
 <link rel="icon" type="image/png" href="logo-efi.png">
@@ -254,639 +157,754 @@ table.bilan { width: 100%; border-collapse: collapse; background: var(--papier);
 .logo-efi.grand { width: 150px; height: 150px; border-radius: 20px; margin-bottom: .7rem; }
 .logo-efi.titre { display: inline-block; vertical-align: middle; width: 56px; height: 56px; margin-right: .5rem; }
 </style>
-</head>
-<body>
+<style>
+/* ---------- Mission finale ---------- */
+.histoire { background: var(--surligne-doux); border-left: 4px solid var(--surligne); padding: .6rem .8rem; border-radius: 0 8px 8px 0; margin: 0 0 .6rem; }
+.mot { display: flex; gap: .25rem; justify-content: center; margin: .1rem 0 .2rem; }
+.mot span { width: 1.9rem; height: 2.3rem; display: grid; place-items: center; border: 2px dashed var(--trait); border-radius: 6px; font: 800 1.2rem var(--f-titre); color: var(--doux); }
+.mot span.gagne { border-style: solid; border-color: var(--ok); background: var(--ok-doux); color: var(--ok); }
+.mot-legende { text-align: center; font-size: .78rem; color: var(--doux); margin: 0 0 .5rem; }
+.s-bouton { display: flex; gap: .55rem; align-items: center; text-align: left; border: 1.5px solid var(--trait); background: var(--fond); border-radius: 9px; padding: .45rem .65rem; cursor: pointer; }
+.s-bouton b { display: block; font-size: .92rem; }
+.s-bouton small { color: var(--doux); font-size: .78rem; }
+.s-bouton .ic { font-size: 1.15rem; }
+.s-bouton.tente { border-color: var(--surligne); background: var(--surligne-doux); }
+.s-bouton.ouvert { border-color: var(--ok); background: var(--ok-doux); }
+.s-bouton.actif { outline: 2.5px solid var(--accent); outline-offset: 1px; }
+.clavier { display: grid; gap: .3rem; }
+.clavier label { font-weight: 700; font-size: .95rem; }
+.clavier label small { font-weight: 400; color: var(--doux); }
+.clavier textarea { font-family: var(--f-code); border: 1.5px solid var(--trait); border-radius: 8px; padding: .5rem .7rem; min-height: 4.2rem; resize: vertical; background: var(--papier); }
+.compteur { font-size: .9rem; color: var(--doux); }
+.indice { background: var(--surligne-doux); border-radius: 8px; padding: .5rem .8rem; }
+.indice pre { margin: .2rem 0 0; white-space: pre-wrap; }
+.verdict { border-radius: 10px; padding: .9rem 1rem; display: grid; gap: .6rem; }
+.verdict.reussi { background: var(--ok-doux); border: 1.5px solid var(--ok); }
+.verdict.rate { background: var(--papier); border: 1.5px solid var(--ko); }
+.verdict h2 { font-size: 1.15rem; }
+.verdict.reussi h2 { color: var(--ok); }
+.verdict.rate h2 { color: var(--ko); }
+.verdict ul { margin: 0; padding-left: 1.2rem; }
+.v-test { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: .5rem; }
+.v-test div span { display: block; font-size: .78rem; font-weight: 700; color: var(--doux); text-transform: uppercase; letter-spacing: .04em; }
+.v-test pre { margin: .1rem 0 0; background: var(--code-fond); border: 1px solid var(--trait); border-radius: 6px; padding: .35rem .55rem; white-space: pre-wrap; }
+.bilan-zone { width: min(960px, 100%); margin: 0 auto; display: grid; gap: 1rem; }
+table.bilan { width: 100%; border-collapse: collapse; background: var(--papier); border: 1px solid var(--trait); border-radius: 12px; overflow: hidden; }
+.bilan th, .bilan td { padding: .55rem .7rem; border-bottom: 1px solid var(--trait); text-align: left; vertical-align: top; font-size: .95rem; }
+.bilan th { background: var(--fond); font-size: .78rem; text-transform: uppercase; letter-spacing: .05em; color: var(--doux); }
+.etiq { display: inline-block; border-radius: 99px; padding: .1rem .6rem; font-size: .82rem; font-weight: 700; white-space: nowrap; }
+.etiq.acquis { background: var(--ok-doux); color: var(--ok); }
+.etiq.encours { background: var(--surligne-doux); color: #8a6300; }
+.etiq.travail { background: var(--ko-doux); color: var(--ko); }
+.bilan td small { color: var(--doux); display: block; }
+.a-revoir { background: var(--papier); border: 1.5px solid var(--surligne); border-radius: 12px; padding: .9rem 1.1rem; }
+.a-revoir h2 { font-size: 1.15rem; margin-bottom: .4rem; }
+.a-revoir ul { margin: 0; padding-left: 1.2rem; display: grid; gap: .25rem; }
+@media print {
+  .no-print { display: none !important; }
+  body { background: #fff; }
+}
+</style>
+</head><body>
 
-<section id="ecran-connexion">
-  <form class="carte-connexion" id="form-connexion" autocomplete="off">
-    <div>
-      <img class="logo-efi grand" src="logo-efi.png" alt="EFI Casablanca">
-      <p class="surtitre" id="etablissement"></p>
-      <h1>Mission <span>finale</span></h1>
-    </div>
-    <p>Connecte-toi avec l'identifiant et le code donnés par ton professeur. Ta progression est enregistrée à chaque vérification.</p>
-    <div class="bandeau-demo" id="bandeau-demo" hidden>Mode démonstration : le site n'est pas encore relié à la Google Sheet. Tape n'importe quel identifiant ; rien n'est envoyé.</div>
-    <div class="champ">
-      <label for="c-id">Identifiant</label>
-      <input id="c-id" name="identifiant" required placeholder="efi26_lm07" autocapitalize="none" spellcheck="false">
-    </div>
-    <div class="champ" id="champ-code">
-      <label for="c-code">Code à 4 chiffres</label>
-      <input id="c-code" name="code" inputmode="numeric" maxlength="8" placeholder="••••">
-    </div>
-    <div class="erreur-connexion" id="erreur-connexion" hidden></div>
-    <button class="bouton plein" type="submit" id="b-connexion">Se connecter</button>
+<section id="ecran-connexion" class="centre">
+  <form class="carte" id="form-connexion" autocomplete="off">
+    <img class="logo-efi grand" src="logo-efi.png" alt="EFI Casablanca">
+    <p class="surtitre" id="etablissement"></p>
+    <h1>Mission finale : escape game</h1>
+    <p class="doux">Connecte-toi avec ton identifiant et ton code habituels. La mission s'ouvre quand ton professeur le décide.</p>
+    <div class="erreur" id="demo" hidden>Cette page fonctionne seulement quand le site est relié à la Google Sheet.</div>
+    <div class="champ"><label for="c-id">Identifiant</label><input id="c-id" required autocapitalize="none" spellcheck="false"></div>
+    <div class="champ"><label for="c-code">Code à 4 chiffres</label><input id="c-code" required inputmode="numeric" maxlength="8"></div>
+    <div class="erreur" id="erreur-connexion" hidden></div>
+    <button class="bouton plein" id="b-connexion" type="submit">Se connecter</button>
   </form>
 </section>
 
-<div id="app" hidden>
+<section id="ecran-info" class="centre" hidden>
+  <div class="carte">
+    <h1 id="info-titre"></h1>
+    <p id="info-texte"></p>
+    <button class="bouton" id="b-reessayer" type="button">Réessayer</button>
+  </div>
+</section>
+
+<section id="ecran-consignes" class="centre" hidden>
+  <div class="carte">
+    <p class="surtitre">Mission finale · travail individuel</p>
+    <h1>🔒 Enfermé·e dans la salle informatique</h1>
+    <p class="histoire">La sonnerie a retenti et la porte s'est verrouillée derrière toi ! Pour sortir, ouvre les <strong>6 verrous</strong>. Chaque verrou ouvert donne une lettre du mot de passe de sortie.</p>
+    <dl class="fiche">
+      <dt>Élève</dt><dd id="cs-eleve"></dd>
+      <dt>Durée</dt><dd id="cs-duree"></dd>
+      <dt>Verrous</dt><dd>6 salles, à faire dans l'ordre que tu veux</dd>
+    </dl>
+    <ul class="regles">
+      <li>La mission s'affiche <strong>en plein écran</strong>. Si tu quittes la page, elle est <strong>bloquée</strong> et ton professeur est prévenu.</li>
+      <li>Le copier-coller est désactivé. Tes voisins n'ont <strong>pas les mêmes salles</strong> que toi.</li>
+      <li>« Exécuter » est illimité. Chaque clic sur <strong>« Essayer d'ouvrir »</strong> compte comme une <strong>tentative</strong>.</li>
+      <li>Les indices sont permis, mais ils comptent dans ton bilan.</li>
+      <li>À la fin (6 verrous ou temps écoulé), ton <strong>bilan de compétences</strong> se remplit tout seul : il te dit quoi revoir avant l'évaluation.</li>
+    </ul>
+    <p class="chargement" id="cs-python">Préparation de Python…</p>
+    <div class="erreur" id="cs-erreur" hidden></div>
+    <button class="bouton plein grand" id="b-commencer" type="button" disabled>Commencer la mission</button>
+  </div>
+</section>
+
+<div id="epreuve" hidden>
   <header class="barre">
-    <img class="logo-efi" src="logo-efi.png" alt="EFI Casablanca">
-    <div class="marque" id="marque">Mission <span>finale</span></div>
-    <nav class="onglets-haut" aria-label="Navigation"><a href="index.html">← Accueil</a><a href="cours.html#algo">📖 Cours algorigrammes</a><a href="cours.html#python">📖 Cours Python</a></nav>
-    <div class="jauge" title="Verrous ouverts">
-      <div class="piste"><div class="rempli" id="jauge" style="width:0%"></div></div>
-      <span id="jauge-texte">0 / 6 verrous</span>
-    </div>
-    <div class="statut" id="statut">Résultats envoyés</div>
-    <div class="eleve"><span id="nom-eleve"></span><small id="classe-eleve"></small>
-      <button class="bouton discret" id="b-deconnexion" type="button">Se déconnecter</button></div>
+    <div class="titre" id="ep-titre"></div>
+    <span class="sauve" id="ep-sauve"></span>
+    <span class="chrono" id="ep-chrono">50:00</span>
   </header>
   <div class="corps">
-    <nav id="parcours" aria-label="Parcours"></nav>
-    <main id="exo">
-      <section class="panneau" id="panneau" hidden></section>
-      <div class="exo-contenu" id="exo-contenu">
-        <div class="exo-tete">
-          <div>
-            <p class="surtitre" id="exo-notion"></p>
-            <h1 id="exo-titre"></h1>
-          </div>
+    <nav id="liste" aria-label="Salles"></nav>
+    <main id="question">
+      <div class="q-contenu">
+        <div>
+          <p class="surtitre" id="q-num"></p>
+          <h1 id="q-titre"></h1>
         </div>
-        <details class="cours" id="cours"><summary id="cours-titre">Ce que tu réutilises</summary><div class="cours-texte" id="cours-texte"></div></details>
-        <div class="enonce" id="enonce"></div>
-        <div class="schema-zone" id="schema" hidden></div>
-        <div class="editeur">
-          <div class="editeur-tete"><span>Ton programme</span>
-            <button class="bouton discret" id="b-reset" type="button">Revenir au code de départ</button></div>
-          <textarea id="code"></textarea>
-        </div>
-        <div class="clavier" id="clavier" hidden>
-          <label for="entree">Entrée clavier <small>ce que l'utilisateur tape, une valeur par ligne</small></label>
-          <textarea id="entree" rows="3" spellcheck="false"></textarea>
+        <div class="enonce" id="q-enonce"></div>
+        <div class="schema-zone" id="q-schema" hidden></div>
+        <div class="editeur"><textarea id="code"></textarea></div>
+        <div class="clavier">
+          <label for="q-entree">Entrée clavier <small>ce que l'utilisateur tape, une valeur par ligne (pour « Exécuter »)</small></label>
+          <textarea id="q-entree" spellcheck="false" autocomplete="off"></textarea>
         </div>
         <div class="actions">
-          <button class="bouton" id="b-executer" type="button" disabled>Exécuter <kbd>Ctrl+Entrée</kbd></button>
-          <button class="bouton plein" id="b-verifier" type="button" disabled>Vérifier mon programme</button>
-          <span class="chargement" id="chargement">Python se charge…</span>
+          <button class="bouton" id="b-executer" type="button">Exécuter</button>
+          <button class="bouton plein" id="b-verifier" type="button">🔑 Essayer d'ouvrir</button>
+          <span class="compteur" id="q-compteur"></span>
           <span class="espace"></span>
-          <button class="bouton discret" id="b-indice" type="button">Un indice</button>
+          <button class="bouton" id="b-indice" type="button">Un indice</button>
+          <button class="bouton" id="b-depart" type="button">Code de départ</button>
         </div>
-        <div id="indices"></div>
-        <div class="console" id="console">
+        <div id="q-indices"></div>
+        <div class="console" id="console" hidden>
           <div class="console-tete">Ce que ton programme affiche</div>
-          <pre id="sortie" class="vide">Clique sur « Exécuter » pour lancer ton programme.</pre>
+          <pre id="sortie"></pre>
           <div class="message" id="message" hidden></div>
         </div>
-        <div id="verdict"></div>
+        <div id="q-verdict"></div>
       </div>
     </main>
   </div>
 </div>
 
+<div class="voile" id="verrou" hidden>
+  <div class="carte" role="alertdialog" aria-labelledby="v-titre">
+    <h1 id="v-titre">Mission bloquée</h1>
+    <p class="grand" id="v-texte">Tu as quitté la page. Lève la main : ton professeur doit venir débloquer ton poste.</p>
+    <p class="doux">Ton travail est conservé. Le temps continue de s'écouler.</p>
+    <div class="champ"><label for="v-code">Code du professeur</label><input id="v-code" type="password" autocomplete="off" inputmode="numeric"></div>
+    <div class="erreur" id="v-erreur" hidden></div>
+    <button class="bouton plein" id="b-debloquer" type="button">Débloquer</button>
+  </div>
+</div>
+
+<div class="voile" id="confirmer" hidden>
+  <div class="carte" role="dialog" aria-labelledby="cf-titre">
+    <h1 id="cf-titre">Terminer la mission ?</h1>
+    <p id="cf-texte"></p>
+    <p class="doux">Tu ne pourras plus essayer d'ouvrir de verrou.</p>
+    <div class="actions">
+      <button class="bouton" id="b-annuler" type="button">Continuer</button>
+      <span class="espace"></span>
+      <button class="bouton danger" id="b-rendre-ok" type="button">Terminer et voir mon bilan</button>
+    </div>
+  </div>
+</div>
+
+<section id="ecran-fin" hidden>
+  <div class="fin bilan-zone" id="fin-zone"></div>
+</section>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
-<script src="config.js?v=20261014d"></script>
-<script src="exercices.js?v=20261109a"></script>
-<script>window.PARCOURS_PY = window.PARCOURS;</script>
-<script src="algorigrammes.js?v=20261109a"></script>
-<script src="schema.js?v=20261109a"></script>
-<script src="mission.js?v=20261109a"></script>
-<script>window.PARCOURS = window.PARCOURS_MISSION;</script>
-<script src="verif.js?v=20261014d"></script>
+<script src="config.js?v=20261109b"></script>
+<script src="evaluations.js?v=20261109b"></script>
+<script src="verif.js?v=20261014c"></script>
+<script src="schema.js?v=20261014c"></script>
 <script>
 "use strict";
 const URL_SERVEUR = (window.CONFIG && CONFIG.url || "").trim();
-const DEMO = !URL_SERVEUR;
-const EXOS = PARCOURS.flatMap((m, im) => m.exercices.map((e, ie) => ({ ...e, module: m, num: `${im + 1}` })));
-const IDS_PY = new Set(PARCOURS_PY.flatMap(m => m.exercices.map(e => e.id)));
-const IDS_ALGO = new Set(PARCOURS_ALGO.flatMap(m => m.exercices.map(e => e.id)));
-const MOT = PARCOURS.map(m => m.lettre).join("");
-const IDS = new Set(EXOS.map(e => e.id));
 const $ = id => document.getElementById(id);
-
-/* ---------- Stockage local (protégé : le navigateur peut le refuser) ---------- */
+const ecrans = ["ecran-connexion", "ecran-info", "ecran-consignes", "epreuve", "ecran-fin"];
+function montrer(id) { ecrans.forEach(e => $(e).hidden = e !== id); }
 const local = {
-  lire(cle, defaut) { try { const v = localStorage.getItem(cle); return v ? JSON.parse(v) : defaut; } catch { return defaut; } },
-  ecrire(cle, v) { try { localStorage.setItem(cle, JSON.stringify(v)); } catch {} },
-  suppr(cle) { try { localStorage.removeItem(cle); } catch {} }
+  lire(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
+  ecrire(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+  suppr(k) { try { localStorage.removeItem(k); } catch {} }
 };
+const esc = t => String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+/* Compétences évaluées par le bilan (les salles qui s'y rattachent sont dans le sujet chiffré). */
+const COMPETENCES = [
+  { id: "c1", titre: "Lire un algorigramme et le faire fonctionner", cours: "cours.html#algo-1" },
+  { id: "c2", titre: "Traduire un algorigramme en Python", cours: "cours.html#algo-3" },
+  { id: "c3", titre: "Faire calculer Python (+ − * / // %)", cours: "cours.html#python-3" },
+  { id: "c4", titre: "Utiliser des variables et l'affectation", cours: "cours.html#python-3" },
+  { id: "c5", titre: "Lire une valeur au clavier et la convertir (input, int)", cours: "cours.html#python-4" },
+  { id: "c6", titre: "Écrire une instruction conditionnelle (if, elif, else, and, or)", cours: "cours.html#python-6" },
+  { id: "c7", titre: "Écrire une boucle bornée (for, range)", cours: "cours.html#python-2" },
+  { id: "c8", titre: "Écrire une boucle non bornée (while) qui s'arrête", cours: "cours.html#python-7" },
+  { id: "c9", titre: "Définir et appeler une fonction (def, return)", cours: "cours.html#python-8" },
+  { id: "c10", titre: "Comprendre une erreur et corriger mon programme", cours: "cours.html#python-1" }
+];
+const NIVEAU_SALLE = { maitrise: "Réussi rapidement", fragile: "Réussi avec difficulté", non: "Pas réussi" };
+const NIVEAU_COMP = { acquis: ["acquis", "Acquis"], encours: ["encours", "En cours"], travail: ["travail", "À travailler"] };
 
 /* ---------- État ---------- */
-const S = { serveur: [], debloque: false, eleve: null, reussis: new Set(), tentes: new Set(), codes: {}, file: [], exo: null, temps: {}, indices: {}, activite: Date.now() };
-function cleEleve() { return "pymission:" + S.eleve.id; }
-function sauver() {
-  local.ecrire(cleEleve(), { reussis: [...S.reussis], tentes: [...S.tentes], codes: S.codes, file: S.file, temps: S.temps });
+const S = {
+  eleve: null, meta: null, salles: [], debut: null, decalage: 0,
+  reponses: {}, suivi: {}, actuelle: 0, actif: false, verrouille: false, termine: false,
+  file: [], modifie: false, ignorerJusqua: 0
+};
+const cleLocale = () => `pymission:${S.eleve.id}:${S.meta.id}`;
+const maintenant = () => Date.now() + S.decalage;
+const suivi = i => S.suivi[i] || (S.suivi[i] = { essais: 0, indices: 0, ouvert: false, meilleur: 0 });
+function etatSauve() { return { version: S.meta.iv, reponses: S.reponses, suivi: S.suivi }; }
+function sauverLocal() { local.ecrire(cleLocale(), { ...etatSauve(), file: S.file }); }
+
+/* ---------- Réseau ---------- */
+async function appelGet(params) {
+  const r = await fetch(URL_SERVEUR + "?" + new URLSearchParams(params));
+  return r.json();
+}
+async function appelPost(corps) {
+  const r = await fetch(URL_SERVEUR, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(corps) });
+  return r.json();
+}
+function evenement(type, contenu) {
+  if (type === "sauvegarde") S.file = S.file.filter(e => e.type !== "sauvegarde");
+  S.file.push({ type, contenu: contenu === undefined ? "" : JSON.stringify(contenu) });
+  sauverLocal();
+  envoyerFile();
+}
+let envoiEnCours = false;
+async function envoyerFile() {
+  if (envoiEnCours || !S.file.length) return majSauve();
+  envoiEnCours = true;
+  majSauve();
+  while (S.file.length) {
+    const e = S.file[0];
+    try {
+      const d = await appelPost({ action: "evalEvenement", id: S.eleve.id, code: S.eleve.code, evaluation: S.meta.id, type: e.type, contenu: e.contenu });
+      if (!d.ok && d.erreur !== "pas_commencee") throw new Error(d.erreur);
+      S.file.shift();
+      sauverLocal();
+      if (e.type === "rendu") termine();
+    } catch {
+      break;
+    }
+  }
+  envoiEnCours = false;
+  majSauve();
+  if (S.file.length) setTimeout(envoyerFile, 4000);
+}
+function majSauve() {
+  const el = $("ep-sauve");
+  if (el) el.textContent = S.file.length ? "Enregistrement…" : "Travail enregistré";
 }
 
-/* ---------- Python dans un worker ---------- */
+/* ---------- Déchiffrement et tirage ---------- */
+function b64(s) { return Uint8Array.from(atob(s), c => c.charCodeAt(0)); }
+async function dechiffrer(meta, cle) {
+  const k = await crypto.subtle.importKey("raw", b64(cle), "AES-GCM", false, ["decrypt"]);
+  const clair = await crypto.subtle.decrypt({ name: "AES-GCM", iv: b64(meta.iv) }, k, b64(meta.donnees));
+  return JSON.parse(new TextDecoder().decode(clair)).questions;
+}
+function graine(t) { let h = 2166136261; for (const c of t) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
+function generateur(g) {
+  return () => { g = (g + 0x6D2B79F5) >>> 0; let t = g; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+}
+// Ordre des salles fixe ; chaque élève reçoit sa propre version de chaque salle.
+function tirerSalles(brutes) {
+  const alea = generateur(graine(S.eleve.id + ":" + S.meta.id));
+  return brutes.map((q, k) => {
+    const v = Math.floor(alea() * q.variantes.length);
+    return { ...q.variantes[v], points: q.points, titre: q.titre, lettre: q.lettre, competences: q.competences || [], num: k + 1, version: "ABC"[v] };
+  });
+}
+const virgule = n => String(n).replace(".", ",");
+
+/* ---------- Python ---------- */
 class Python {
   constructor() { this.attente = new Map(); this.n = 0; this.demarrer(); }
   demarrer() {
     this.pret = new Promise((ok, ko) => { this._ok = ok; this._ko = ko; });
-    this.w = new Worker("worker.js?v=20261014d");
+    this.w = new Worker("worker.js?v=20261014c");
     this.w.onmessage = e => {
       const d = e.data;
-      if (d.type === "pret") { this._ok(); etatPython(true); }
-      else if (d.type === "echec") { this._ko(d.message); etatPython(false, true); }
+      if (d.type === "pret") this._ok();
+      else if (d.type === "echec") this._ko(d.message);
       else if (d.type === "resultat") { const f = this.attente.get(d.id); if (f) { this.attente.delete(d.id); f(d); } }
     };
-    this.w.onerror = () => etatPython(false, true);
   }
   async lancer(params, delai = 3000) {
     await this.pret;
     const id = ++this.n;
     return new Promise(res => {
-      const minuteur = setTimeout(() => {
-        this.attente.delete(id);
-        this.w.terminate();
-        etatPython(false);
-        this.demarrer();
+      const m = setTimeout(() => {
+        this.attente.delete(id); this.w.terminate(); this.demarrer();
         res({ sortie: "", erreur: { type: "Expire", message: "", ligne: null } });
       }, delai);
-      this.attente.set(id, d => { clearTimeout(minuteur); res(d); });
+      this.attente.set(id, d => { clearTimeout(m); res(d); });
       this.w.postMessage({ id, ...params });
     });
   }
 }
 let python = null;
-let occupe = false;
-function etatPython(pret, echec) {
-  $("chargement").hidden = pret;
-  $("chargement").textContent = echec ? "Python n'a pas pu se charger. Recharge la page." : "Python se charge…";
-  $("b-executer").disabled = !pret || occupe;
-  $("b-verifier").disabled = !pret || occupe;
-}
-
-/* ---------- Échanges avec la Google Sheet ---------- */
-async function appelGet(params) {
-  const r = await fetch(URL_SERVEUR + "?" + new URLSearchParams(params));
-  return r.json();
-}
-let envoiEnCours = false;
-async function envoyer() {
-  majStatut();
-  if (DEMO || envoiEnCours || !S.file.length || !navigator.onLine) return;
-  envoiEnCours = true;
-  const lot = S.file.slice(0, 20);
-  try {
-    const r = await fetch(URL_SERVEUR, {
-      method: "POST",
-      headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify({ action: "essais", id: S.eleve.id, code: S.eleve.code, essais: lot })
-    });
-    const d = await r.json();
-    if (d.ok) { S.file.splice(0, lot.length); sauver(); }
-    else if (d.erreur === "identifiant_ou_code") { S.file = []; sauver(); deconnecter("Ton code a changé. Reconnecte-toi."); }
-  } catch { /* nouvel essai plus tard */ }
-  envoiEnCours = false;
-  majStatut();
-  if (S.file.length && !envoiEnCours) setTimeout(envoyer, 3000);
-}
-function majStatut() {
-  const st = $("statut");
-  st.className = "statut";
-  if (DEMO) { st.classList.add("demo"); st.textContent = "Mode démonstration : rien n'est envoyé"; return; }
-  if (S.file.length) { st.classList.add("attente"); st.textContent = `${S.file.length} résultat${S.file.length > 1 ? "s" : ""} en attente d'envoi`; }
-  else st.textContent = "Résultats envoyés";
-}
-setInterval(envoyer, 30000);
-window.addEventListener("online", envoyer);
 
 /* ---------- Connexion ---------- */
-function initConnexion() {
-  $("etablissement").textContent = (window.CONFIG && CONFIG.etablissement) || "";
-  if (window.CONFIG && CONFIG.titre) document.title = CONFIG.titre;
-  $("bandeau-demo").hidden = !DEMO;
-  $("champ-code").hidden = DEMO;
-  $("c-code").required = !DEMO;
-  const session = local.lire("pyclasse:session", null);
-  if (session) { ouvrir(session, null); return; }
-  if (!DEMO) { location.replace("index.html"); return; }
-  $("form-connexion").addEventListener("submit", async ev => {
-    ev.preventDefault();
-    const id = $("c-id").value.trim().toLowerCase();
-    const code = $("c-code").value.trim();
-    const err = $("erreur-connexion");
-    err.hidden = true;
-    if (!id) return;
-    if (DEMO) { ouvrir({ id, code: "", prenom: id, classe: "démo" }, null); return; }
-    $("b-connexion").disabled = true;
-    $("b-connexion").textContent = "Connexion…";
-    try {
-      const d = await appelGet({ action: "connexion", id, code });
-      if (!d.ok) { err.textContent = "Identifiant ou code incorrect. Vérifie-les avec ton professeur."; err.hidden = false; }
-      else ouvrir({ id, code, prenom: d.prenom, classe: d.classe }, d);
-    } catch {
-      err.textContent = "Connexion impossible. Vérifie que l'ordinateur a accès à Internet, puis réessaie.";
-      err.hidden = false;
+$("etablissement").textContent = (window.CONFIG && CONFIG.etablissement) || "";
+if (!URL_SERVEUR) { $("demo").hidden = false; $("b-connexion").disabled = true; }
+const session = local.lire("pyclasse:session", null);
+if (session && session.code) { $("c-id").value = session.id; }
+
+$("form-connexion").addEventListener("submit", async ev => {
+  ev.preventDefault();
+  S.eleve = { id: $("c-id").value.trim().toLowerCase(), code: $("c-code").value.trim() };
+  await charger();
+});
+$("b-reessayer").addEventListener("click", charger);
+
+async function charger() {
+  const err = $("erreur-connexion");
+  err.hidden = true;
+  $("b-connexion").disabled = true;
+  try {
+    const d = await appelGet({ action: "evalEtat", id: S.eleve.id, code: S.eleve.code });
+    if (!d.ok) { err.textContent = "Identifiant ou code incorrect."; err.hidden = false; montrer("ecran-connexion"); return; }
+    S.eleve.prenom = d.prenom;
+    S.eleve.classe = d.classe;
+    const meta = d.eval && (window.EVALUATIONS || []).find(e => e.id === d.eval.id);
+    if (!d.eval || !meta || meta.mode !== "mission") {
+      if (d.eval && meta && meta.mode !== "mission") return info("C'est une évaluation", "Ton professeur a ouvert une évaluation, pas la mission. Va sur la page Évaluation depuis l'accueil.");
+      return info("Mission pas encore ouverte", `Bonjour ${d.prenom}. Ton professeur ouvre la mission en classe, pendant la séance avant l'évaluation. Attends son signal, puis clique sur Réessayer.`);
     }
+    S.meta = meta;
+    if (d.eval.rendu) return info("Mission terminée", "Tu as déjà terminé la mission. Ton bilan de compétences a été envoyé à ton professeur.");
+    S.salles = tirerSalles(await dechiffrer(S.meta, d.eval.cle));
+    S.decalage = d.eval.maintenant - Date.now();
+    S.debut = d.eval.debut;
+    const l = local.lire(cleLocale(), {});
+    const serv = d.eval.reponses && d.eval.reponses.version === S.meta.iv ? d.eval.reponses : {};
+    const loc = l.version === S.meta.iv ? l : {};
+    S.reponses = Object.assign({}, serv.reponses || {}, loc.reponses || {});
+    // Le suivi (tentatives, verrous ouverts) le plus avancé l'emporte.
+    S.suivi = {};
+    S.salles.forEach((_, i) => {
+      const a = (serv.suivi || {})[i], b = (loc.suivi || {})[i];
+      const x = [a, b].filter(Boolean).sort((p, q) => (q.essais + q.indices) - (p.essais + p.indices))[0];
+      if (x) S.suivi[i] = { ...x, ouvert: !!((a && a.ouvert) || (b && b.ouvert)) };
+    });
+    S.file = loc.file || [];
+    S.reprise = !!S.debut;
+    S.verrouille = !!d.eval.verrouille;
+    consignes();
+  } catch (e) {
+    err.textContent = "Connexion impossible. Vérifie l'accès à Internet puis réessaie.";
+    err.hidden = false;
+    montrer("ecran-connexion");
+  } finally {
     $("b-connexion").disabled = false;
-    $("b-connexion").textContent = "Se connecter";
-  });
-}
-
-function ouvrir(session, serveur) {
-  S.eleve = session;
-  local.ecrire("pyclasse:session", session);
-  const l = local.lire(cleEleve(), {});
-  S.reussis = new Set((l.reussis || []).filter(x => IDS.has(x)));
-  S.tentes = new Set((l.tentes || []).filter(x => IDS.has(x)));
-  S.codes = l.codes || {};
-  S.file = l.file || [];
-  S.temps = l.temps || {};
-  if (serveur) {
-    S.serveur = serveur.reussis || [];
-    (serveur.reussis || []).filter(x => IDS.has(x)).forEach(x => S.reussis.add(x));
-    Object.entries(serveur.codes || {}).filter(([exo]) => IDS.has(exo)).forEach(([exo, code]) => { S.tentes.add(exo); if (!(exo in S.codes)) S.codes[exo] = code; });
-    sauver();
-  } else if (!DEMO) {
-    // Session reprise : on resynchronise en arrière-plan ce qui a été fait sur un autre poste.
-    appelGet({ action: "connexion", id: session.id, code: session.code }).then(d => {
-      if (!d.ok) { S.verifie = true; demarrerMission(); return; }
-      S.serveur = d.reussis || [];
-      (d.reussis || []).filter(x => IDS.has(x)).forEach(x => S.reussis.add(x));
-      Object.entries(d.codes || {}).filter(([exo]) => IDS.has(exo)).forEach(([exo, code]) => { S.tentes.add(exo); if (!(exo in S.codes)) S.codes[exo] = code; });
-      sauver(); S.verifie = true; demarrerMission();
-    }).catch(() => { S.verifie = true; demarrerMission(); });
   }
-  $("ecran-connexion").hidden = true;
-  $("app").hidden = false;
-  $("nom-eleve").textContent = session.prenom || session.id;
-  $("classe-eleve").textContent = session.classe ? " · " + session.classe : "";
-  if (serveur || DEMO) S.verifie = true;
-  majStatut();
-  demarrerMission();
-  envoyer();
+}
+function info(titre, texte) {
+  $("info-titre").textContent = titre;
+  $("info-texte").textContent = texte;
+  $("b-reessayer").hidden = false;
+  montrer("ecran-info");
 }
 
-/* ---------- Déblocage ---------- */
-function avancement() {
-  const tous = new Set([...(local.lire("pyclasse:" + S.eleve.id, {}).reussis || []), ...(local.lire("pyalgo:" + S.eleve.id, {}).reussis || []), ...S.serveur]);
-  const py = [...IDS_PY].filter(x => tous.has(x)).length, al = [...IDS_ALGO].filter(x => tous.has(x)).length;
-  return { tous, py, al, ok: py === IDS_PY.size && al === IDS_ALGO.size };
-}
-function demarrerMission() {
-  const a = avancement();
-  S.debloque = a.ok || S.eleve.id === "testprof";
-  dessinerParcours();
-  majJauge();
-  if (!S.debloque) { afficherVerrou(a); return; }
-  if (!python) python = new Python();
-  if (S.exo && !$("exo-contenu").hidden) return;
-  const premier = EXOS.find(e => !S.reussis.has(e.id));
-  if (premier) choisir(premier.id); else afficherBilan();
-}
-function afficherVerrou(a) {
-  const p = $("panneau");
-  $("exo-contenu").hidden = true;
-  p.hidden = false;
-  if (!S.verifie) { p.innerHTML = `<p class="chargement">Vérification de ta progression…</p>`; return; }
-  const ligne = (nom, n, t, lien) => `<div class="ligne-prog"><a href="${lien}"><b>${nom}</b></a><div class="piste-l"><div style="width:${100 * n / t}%"></div></div><span>${n} / ${t}</span></div>`;
-  p.innerHTML = `<p class="surtitre">Mission finale</p><h1>🔒 Escape game : la salle informatique</h1>
-  <div class="verrou-boite">
-    <p style="margin:0">Cette mission se débloque quand tu as réussi <strong>tous</strong> les exercices d'algorigrammes <strong>et</strong> tous les exercices Python. Elle reprend tout ce que tu as appris, avant l'évaluation, et se termine par ton <strong>bilan de compétences</strong>.</p>
-    ${ligne("Algorigrammes", a.al, IDS_ALGO.size, "algo.html")}
-    ${ligne("Python", a.py, IDS_PY.size, "python.html")}
-    <p class="manque" style="margin:0">Encore ${IDS_ALGO.size - a.al + IDS_PY.size - a.py} exercice(s) à réussir. Tu as déjà fait des exercices sur un autre ordinateur ? Ils sont comptés automatiquement.</p>
-  </div>`;
-}
-
-async function deconnecter(message) {
-  if (S.file.length && !DEMO && !message) {
-    $("b-deconnexion").textContent = "Envoi des résultats…";
-    await Promise.race([envoyer(), new Promise(r => setTimeout(r, 4000))]);
+/* ---------- Consignes ---------- */
+function consignes() {
+  $("cs-eleve").textContent = `${S.eleve.prenom} · ${S.eleve.classe}`;
+  $("cs-duree").textContent = S.reprise ? `${S.meta.duree} min (déjà commencée)` : `${S.meta.duree} min, chronométrées`;
+  $("b-commencer").textContent = S.reprise ? "Reprendre la mission" : "Commencer la mission";
+  montrer("ecran-consignes");
+  if (!python) {
+    python = new Python();
+    python.pret.then(() => { $("cs-python").hidden = true; $("b-commencer").disabled = false; })
+      .catch(() => { $("cs-python").textContent = "Python n'a pas pu se charger. Recharge la page."; });
   }
-  local.suppr("pyclasse:session");
-  if (message) local.ecrire("pyclasse:message", message);
-  location.href = "index.html";
 }
-$("b-deconnexion").addEventListener("click", () => deconnecter());
+async function pleinEcran() {
+  if (document.fullscreenElement) return true;
+  try { await document.documentElement.requestFullscreen({ navigationUI: "hide" }); return true; }
+  catch { return false; }
+}
+$("b-commencer").addEventListener("click", async () => {
+  const csErr = $("cs-erreur");
+  csErr.hidden = true;
+  S.ignorerJusqua = Date.now() + 2000;
+  const ok = await pleinEcran();
+  if (!ok) { csErr.textContent = "Le plein écran est obligatoire. Utilise Chrome, Edge ou Firefox sur un ordinateur, puis réessaie."; csErr.hidden = false; return; }
+  $("b-commencer").disabled = true;
+  if (!S.debut) {
+    try {
+      const d = await appelPost({ action: "evalEvenement", id: S.eleve.id, code: S.eleve.code, evaluation: S.meta.id, type: "debut" });
+      if (!d.ok) throw new Error(d.erreur);
+      S.debut = d.debut;
+    } catch (e) {
+      csErr.textContent = e.message === "fermee" ? "La mission vient d'être fermée par ton professeur." : "Impossible de démarrer : vérifie la connexion puis réessaie.";
+      csErr.hidden = false;
+      $("b-commencer").disabled = false;
+      if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+      return;
+    }
+  }
+  demarrerEpreuve();
+});
 
-/* ---------- Parcours ---------- */
-function dessinerParcours() {
-  const nav = $("parcours");
-  nav.innerHTML = "";
-  const tete = document.createElement("section");
-  tete.innerHTML = `<div class="mot">${[...MOT].map((l, i) => `<span class="${S.reussis.has(EXOS[i].id) ? "gagne" : ""}">${S.reussis.has(EXOS[i].id) ? l : "?"}</span>`).join("")}</div><p class="mot-legende">Le mot de passe de sortie</p>`;
-  nav.appendChild(tete);
-  const liste = document.createElement("section");
-  liste.className = "salles";
-  EXOS.forEach((e, i) => {
-    const b = document.createElement("button");
-    b.type = "button";
-    b.className = "salle";
-    const fait = S.reussis.has(e.id);
-    if (fait) b.classList.add("reussi"); else if (S.tentes.has(e.id)) b.classList.add("tente");
-    if (S.exo && S.exo.id === e.id && $("panneau").hidden) b.classList.add("actif");
-    b.disabled = !S.debloque;
-    b.innerHTML = `<span class="ic">${!S.debloque ? "🔒" : fait ? "🔓" : "🚪"}</span><span><b></b><small></small></span>`;
-    b.querySelector("b").textContent = `Salle ${i + 1} · ${e.titre}`;
-    b.querySelector("small").textContent = e.module.notion;
-    b.addEventListener("click", () => choisir(e.id));
-    liste.appendChild(b);
-  });
-  const bb = document.createElement("button");
-  bb.type = "button";
-  bb.className = "salle bilan" + (!$("panneau").hidden && S.debloque ? " actif" : "");
-  bb.disabled = !S.debloque;
-  bb.innerHTML = `<span class="ic">📋</span><span><b>Mon bilan de compétences</b><small>Ce que je sais faire avant l'évaluation</small></span>`;
-  bb.addEventListener("click", afficherBilan);
-  liste.appendChild(bb);
-  nav.appendChild(liste);
-}
-function majJauge() {
-  const n = EXOS.filter(e => S.reussis.has(e.id)).length, t = EXOS.length;
-  $("jauge").style.width = (100 * n / t) + "%";
-  $("jauge-texte").textContent = `${n} / ${t} verrous`;
-}
-
-/* ---------- Éditeur ---------- */
+/* ---------- Épreuve ---------- */
 const editeur = CodeMirror.fromTextArea($("code"), {
-  mode: "python", lineNumbers: true, indentUnit: 4, tabSize: 4, indentWithTabs: false, matchBrackets: true,
+  mode: "python", lineNumbers: true, indentUnit: 4, tabSize: 4, indentWithTabs: false,
+  dragDrop: false, inputStyle: "contenteditable",
   extraKeys: {
     Tab: cm => cm.somethingSelected() ? cm.indentSelection("add") : cm.replaceSelection("    ", "end"),
     "Shift-Tab": cm => cm.indentSelection("subtract"),
     "Ctrl-Enter": () => executer(), "Cmd-Enter": () => executer()
   }
 });
-let ligneMarquee = null;
-let sauvegardeDiff = null;
-editeur.on("change", () => {
-  S.activite = Date.now();
-  if (ligneMarquee !== null) { editeur.removeLineClass(ligneMarquee, "background", "ligne-erreur"); ligneMarquee = null; }
-  clearTimeout(sauvegardeDiff);
-  sauvegardeDiff = setTimeout(() => { if (S.exo) { S.codes[S.exo.id] = editeur.getValue(); sauver(); } }, 600);
-});
-function marquerLigne(n) {
-  if (!n || n > editeur.lineCount()) return;
-  ligneMarquee = n - 1;
-  editeur.addLineClass(ligneMarquee, "background", "ligne-erreur");
+editeur.on("beforeChange", (cm, ch) => { if (ch.origin === "paste" || ch.origin === "drop") ch.cancel(); });
+editeur.on("change", () => { if (S.actif) { S.reponses[S.actuelle] = editeur.getValue(); S.modifie = true; sauverLocal(); } });
+
+function demarrerEpreuve() {
+  S.actif = true;
+  $("ep-titre").innerHTML = "";
+  $("ep-titre").append("Mission finale : escape game");
+  const sm = document.createElement("small"); sm.textContent = `${S.eleve.prenom} · ${S.eleve.classe}`; $("ep-titre").appendChild(sm);
+  montrer("epreuve");
+  const premiere = S.salles.findIndex((_, i) => !suivi(i).ouvert);
+  afficherSalle(premiere < 0 ? 0 : premiere);
+  majSauve();
+  envoyerFile();
+  setInterval(tic, 1000);
+  setInterval(() => { if (S.modifie && !S.termine) { S.modifie = false; evenement("sauvegarde", etatSauve()); } }, 30000);
+  tic();
+  if (S.verrouille) verrouiller(null, true);
+  else if (S.reprise) incident("reprise", true);
 }
 
-/* ---------- Temps passé (actif seulement : page visible et activité récente) ---------- */
-["keydown", "pointerdown", "scroll"].forEach(t => document.addEventListener(t, () => { S.activite = Date.now(); }, { passive: true }));
-setInterval(() => {
-  if (!S.exo || document.hidden || Date.now() - S.activite > 180000) return;
-  S.temps[S.exo.id] = (S.temps[S.exo.id] || 0) + 15;
-}, 15000);
+function dessinerListe() {
+  const nav = $("liste");
+  nav.innerHTML = "";
+  const mot = document.createElement("div");
+  mot.innerHTML = `<div class="mot">${S.salles.map((s, i) => suivi(i).ouvert ? `<span class="gagne">${esc(s.lettre)}</span>` : "<span>?</span>").join("")}</div><p class="mot-legende">Le mot de passe de sortie</p>`;
+  nav.appendChild(mot);
+  S.salles.forEach((s, i) => {
+    const t = suivi(i);
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "s-bouton" + (i === S.actuelle ? " actif" : "") + (t.ouvert ? " ouvert" : t.essais ? " tente" : "");
+    b.innerHTML = `<span class="ic">${t.ouvert ? "🔓" : "🔒"}</span><span><b></b><small></small></span>`;
+    b.querySelector("b").textContent = `Salle ${i + 1} · ${s.titre}`;
+    b.querySelector("small").textContent = t.ouvert ? `ouvert · ${t.essais} tentative${t.essais > 1 ? "s" : ""}` : t.essais ? `${t.essais} tentative${t.essais > 1 ? "s" : ""}` : "pas encore essayé";
+    b.addEventListener("click", () => afficherSalle(i));
+    nav.appendChild(b);
+  });
+  const r = document.createElement("button");
+  r.type = "button"; r.className = "bouton danger"; r.textContent = "Terminer la mission";
+  r.addEventListener("click", demanderRendu);
+  nav.appendChild(r);
+}
 
-/* ---------- Affichage d'un exercice ---------- */
-function choisir(id) {
-  if (!S.debloque) return;
-  $("panneau").hidden = true;
-  $("exo-contenu").hidden = false;
-  if (S.exo) { S.codes[S.exo.id] = editeur.getValue(); sauver(); }
-  const exo = EXOS.find(e => e.id === id);
-  S.exo = exo;
-  $("exo-notion").textContent = `Salle ${exo.num} sur ${EXOS.length} · ${exo.module.notion}`;
-  $("exo-titre").innerHTML = `<span class="num"></span><span class="t"></span>`;
-  $("exo-titre").querySelector(".num").textContent = exo.num;
-  $("exo-titre").querySelector(".t").textContent = exo.titre;
-  $("cours-titre").textContent = "Ce que tu réutilises dans cette salle";
-  $("cours-texte").innerHTML = exo.module.cours;
-  $("cours").open = false;
-  $("enonce").innerHTML = exo.enonce;
-  $("schema").hidden = !exo.schema;
-  $("schema").innerHTML = exo.schema ? Schema.dessiner(exo.schema) : "";
-  const sauve = S.codes[exo.id];
-  editeur.setValue(sauve && sauve.trim() ? sauve : exo.depart);
+function afficherSalle(i) {
+  if (S.actif && S.salles[S.actuelle]) S.reponses[S.actuelle] = editeur.getValue();
+  S.actuelle = i;
+  const q = S.salles[i], t = suivi(i);
+  $("q-num").textContent = `Salle ${i + 1} sur ${S.salles.length} · version ${q.version}`;
+  $("q-titre").textContent = q.titre;
+  $("q-enonce").innerHTML = q.enonce;
+  $("q-schema").hidden = !q.schema;
+  $("q-schema").innerHTML = q.schema ? Schema.dessiner(q.schema) : "";
+  const r = S.reponses[i];
+  S.actif = false;
+  editeur.setValue(r !== undefined && String(r).trim() ? r : (q.depart || ""));
+  S.actif = true;
   editeur.clearHistory();
-  const avecClavier = exo.tests.some(t => t.entree);
-  $("clavier").hidden = !avecClavier;
-  $("entree").value = avecClavier ? (exo.tests.find(t => t.entree).entree) : "";
-  $("indices").innerHTML = "";
-  S.indices[exo.id] = 0;
-  $("b-indice").hidden = !(exo.indices && exo.indices.length);
-  $("b-indice").textContent = "Un indice";
-  viderConsole();
-  $("verdict").innerHTML = "";
-  dessinerParcours();
-  $("exo").scrollTop = 0;
+  const ex = (q.tests || []).find(x => x.entree);
+  $("q-entree").value = ex && !ex.ajout ? ex.entree : "";
+  $("console").hidden = true;
+  $("q-indices").innerHTML = "";
+  for (let k = 0; k < t.indices; k++) ajouterIndice(q, k);
+  majBoutonIndice();
+  $("q-verdict").innerHTML = "";
+  if (t.ouvert) $("q-verdict").innerHTML = `<div class="verdict reussi"><h2>🔓 Verrou déjà ouvert : lettre ${esc(q.lettre)}</h2><p style="margin:0">Tu peux passer à une autre salle.</p></div>`;
+  majCompteur();
+  dessinerListe();
+  $("question").scrollTop = 0;
   setTimeout(() => editeur.refresh(), 0);
 }
-$("b-reset").addEventListener("click", () => { editeur.setValue(S.exo.depart); editeur.focus(); });
-$("b-indice").addEventListener("click", () => {
-  const exo = S.exo, i = S.indices[exo.id] || 0;
-  if (i >= exo.indices.length) return;
+function majCompteur() {
+  const t = suivi(S.actuelle);
+  $("q-compteur").textContent = `Tentatives : ${t.essais}` + (t.indices ? ` · indices : ${t.indices}` : "");
+  $("b-verifier").disabled = t.ouvert || S.verrouille;
+}
+function ajouterIndice(q, k) {
   const d = document.createElement("div");
   d.className = "indice";
-  d.innerHTML = `<b>Indice ${i + 1}</b><pre></pre>`;
-  d.querySelector("pre").textContent = exo.indices[i];
-  $("indices").appendChild(d);
-  S.indices[exo.id] = i + 1;
-  if (i + 1 >= exo.indices.length) $("b-indice").hidden = true;
-  else $("b-indice").textContent = "Un autre indice";
+  d.innerHTML = `<b>Indice ${k + 1}</b><pre></pre>`;
+  d.querySelector("pre").textContent = q.indices[k];
+  $("q-indices").appendChild(d);
+}
+function majBoutonIndice() {
+  const q = S.salles[S.actuelle], t = suivi(S.actuelle);
+  const n = (q.indices || []).length;
+  $("b-indice").hidden = t.indices >= n || t.ouvert;
+  $("b-indice").textContent = t.indices ? "Un autre indice" : "Un indice";
+}
+$("b-indice").addEventListener("click", () => {
+  const q = S.salles[S.actuelle], t = suivi(S.actuelle);
+  if (t.indices >= (q.indices || []).length) return;
+  ajouterIndice(q, t.indices);
+  t.indices++;
+  majBoutonIndice(); majCompteur();
+  evenement("sauvegarde", etatSauve());
 });
+$("b-depart").addEventListener("click", () => { editeur.setValue(S.salles[S.actuelle].depart || ""); editeur.focus(); });
 
-/* ---------- Console ---------- */
-function viderConsole() {
-  const s = $("sortie");
-  s.textContent = "Clique sur « Exécuter » pour lancer ton programme.";
-  s.className = "vide";
-  $("message").hidden = true;
-}
-function afficherErreur(err) {
-  const m = VERIF.messageErreur(err);
-  if (!m) { $("message").hidden = true; return; }
-  $("message").innerHTML = "<strong>Problème : </strong><span></span><span class=\"brut\"></span>";
-  $("message").querySelector("span").textContent = m.texte;
-  $("message").querySelector(".brut").textContent = m.brut;
-  $("message").hidden = false;
-  marquerLigne(err.ligne);
-}
-function occuper(oui) {
-  occupe = oui;
-  $("b-executer").disabled = oui;
-  $("b-verifier").disabled = oui;
-}
-
+let occupe = false;
 async function executer() {
-  if (occupe || !python) return;
-  occuper(true);
-  $("sortie").className = "";
+  if (occupe || S.verrouille || !S.actif) return;
+  occupe = true;
+  $("b-executer").disabled = true;
+  $("console").hidden = false;
   $("sortie").textContent = "…";
   $("message").hidden = true;
-  const r = await python.lancer({ code: editeur.getValue(), entree: $("entree").value.replace(/\n+$/, ""), echo: true });
-  $("sortie").textContent = r.sortie || "";
-  if (!r.sortie) { $("sortie").className = "vide"; $("sortie").textContent = r.erreur ? "(rien n'a été affiché)" : "(le programme n'affiche rien)"; }
-  afficherErreur(r.erreur);
-  occuper(false);
+  const r = await python.lancer({ code: editeur.getValue(), entree: $("q-entree").value.replace(/\n+$/, ""), echo: true });
+  $("sortie").textContent = r.sortie || (r.erreur ? "(rien n'a été affiché)" : "(le programme n'affiche rien)");
+  const m = VERIF.messageErreur(r.erreur);
+  if (m) { $("message").textContent = "Problème : " + m.texte; $("message").hidden = false; }
+  $("b-executer").disabled = false;
+  occupe = false;
 }
 $("b-executer").addEventListener("click", executer);
 
-/* ---------- Vérification ---------- */
-async function verifier() {
-  if (occupe || !python) return;
-  const exo = S.exo, code = editeur.getValue();
-  occuper(true);
-  $("verdict").innerHTML = `<span class="chargement">Vérification en cours…</span>`;
-  const regles = VERIF.problemesDeCode(exo, code);
-  const resultats = [];
-  let premiereErreur = null;
-  for (const t of exo.tests) {
+function derniereLigne(t) { const l = String(t).replace(/\r/g, "").split("\n").map(x => x.trimEnd()).filter(x => x !== ""); return l.length ? l[l.length - 1] : ""; }
+async function passerTests(q, code) {
+  const regles = VERIF.problemesDeCode(q, code);
+  let ok = 0, echec = null;
+  for (const t of q.tests) {
     const r = await python.lancer({ code, entree: t.entree || "", ajout: t.ajout || "", echo: false });
-    const ok = !r.erreur && VERIF.normaliser(r.sortie) === VERIF.normaliser(t.attendu);
-    resultats.push({ t, r, ok });
-    if (r.erreur && !premiereErreur) premiereErreur = r.erreur;
+    const obtenu = t.ajout ? derniereLigne(r.sortie) : VERIF.normaliser(r.sortie);
+    const attendu = t.ajout ? derniereLigne(t.attendu) : VERIF.normaliser(t.attendu);
+    if (!r.erreur && obtenu === attendu) ok++;
+    else if (!echec) echec = { t, r, obtenu, attendu };
     if (r.erreur && (r.erreur.type === "Expire" || /SyntaxError|IndentationError|TabError/.test(r.erreur.type))) break;
   }
-  const nbOk = resultats.filter(x => x.ok).length;
-  const reussi = regles.length === 0 && nbOk === exo.tests.length;
-  const typeErreur = reussi ? "" : premiereErreur ? premiereErreur.type : regles.length && nbOk === exo.tests.length ? "Consigne" : "Sortie";
-
-  // Enregistrement de l'essai
-  S.file.push({ t: Date.now(), exo: exo.id, reussi, ok: nbOk, total: exo.tests.length, duree: S.temps[exo.id] || 0, erreur: typeErreur, code });
-  S.temps[exo.id] = 0;
-  S.tentes.add(exo.id);
-  const nouveau = reussi && !S.reussis.has(exo.id);
-  if (reussi) S.reussis.add(exo.id);
-  S.codes[exo.id] = code;
-  sauver();
-  envoyer();
-
-  afficherVerdict(exo, reussi, nouveau, regles, resultats, premiereErreur);
-  if (premiereErreur) {
-    $("sortie").className = "";
-    $("sortie").textContent = resultats.find(x => x.r.erreur).r.sortie || "(rien n'a été affiché)";
-    afficherErreur(premiereErreur);
-  }
-  dessinerParcours();
-  majJauge();
-  occuper(false);
+  return { ok, total: q.tests.length, regles, echec, reussi: ok === q.tests.length && !regles.length };
+}
+async function verifier() {
+  const i = S.actuelle, q = S.salles[i], t = suivi(i);
+  if (occupe || S.verrouille || t.ouvert || S.termine) return;
+  occupe = true;
+  $("b-verifier").disabled = true;
+  $("q-verdict").innerHTML = `<p class="chargement">On essaie la serrure…</p>`;
+  const code = editeur.getValue();
+  S.reponses[i] = code;
+  const res = await passerTests(q, code);
+  t.essais++;
+  t.meilleur = Math.max(t.meilleur || 0, res.regles.length ? res.ok / res.total / 2 : res.ok / res.total);
+  if (res.reussi) t.ouvert = true;
+  evenement("sauvegarde", etatSauve());
+  afficherVerdict(q, res);
+  majCompteur(); majBoutonIndice(); dessinerListe();
+  occupe = false;
+  if (S.salles.every((_, k) => suivi(k).ouvert)) setTimeout(() => { if (!S.termine) finMission(); }, 1500);
 }
 $("b-verifier").addEventListener("click", verifier);
 
-function bloc(etiquette, texte) {
-  const d = document.createElement("div");
-  d.innerHTML = "<span></span><pre></pre>";
-  d.querySelector("span").textContent = etiquette;
-  d.querySelector("pre").textContent = texte === "" ? "(rien)" : texte;
-  return d;
-}
-function afficherVerdict(exo, reussi, nouveau, regles, resultats, err) {
-  const v = $("verdict");
-  v.innerHTML = "";
-  const boite = document.createElement("div");
-  boite.className = "verdict " + (reussi ? "reussi" : "rate");
-  const h = document.createElement("h2");
-  const nbOk = resultats.filter(x => x.ok).length;
-  h.textContent = reussi ? (nouveau ? "Réussi ! Tous les tests passent." : "Toujours réussi.") : `Pas encore : ${nbOk} test${nbOk > 1 ? "s" : ""} réussi${nbOk > 1 ? "s" : ""} sur ${exo.tests.length}.`;
-  boite.appendChild(h);
-  if (reussi) {
-    const g = document.createElement("p");
-    g.className = "gain";
-    g.textContent = `🔓 Verrou ${exo.num} ouvert ! Lettre gagnée : ${exo.module.lettre}`;
-    boite.appendChild(g);
+function afficherVerdict(q, res) {
+  const v = $("q-verdict");
+  if (res.reussi) {
+    const reste = S.salles.findIndex((_, k) => !suivi(k).ouvert);
+    v.innerHTML = `<div class="verdict reussi"><h2>🔓 Verrou ouvert ! Lettre gagnée : ${esc(q.lettre)}</h2>${reste >= 0 ? `<div class="actions"><button class="bouton plein" type="button" id="b-suivante">Salle suivante →</button></div>` : `<p style="margin:0"><strong>Les 6 verrous sont ouverts !</strong> La porte s'ouvre…</p>`}</div>`;
+    if (reste >= 0) $("b-suivante").addEventListener("click", () => afficherSalle(S.salles.findIndex((_, k) => k > S.actuelle && !suivi(k).ouvert) >= 0 ? S.salles.findIndex((_, k) => k > S.actuelle && !suivi(k).ouvert) : reste));
+    return;
   }
-  if (regles.length) {
+  const boite = document.createElement("div");
+  boite.className = "verdict rate";
+  const h = document.createElement("h2");
+  h.textContent = `🔒 Le verrou résiste : ${res.ok} test${res.ok > 1 ? "s" : ""} réussi${res.ok > 1 ? "s" : ""} sur ${res.total}.`;
+  boite.appendChild(h);
+  if (res.regles.length) {
     const ul = document.createElement("ul");
-    ul.className = "regles";
-    regles.forEach(r => { const li = document.createElement("li"); li.textContent = r; ul.appendChild(li); });
+    res.regles.forEach(r => { const li = document.createElement("li"); li.textContent = r; ul.appendChild(li); });
     boite.appendChild(ul);
   }
-  if (!reussi) {
-    const liste = document.createElement("div");
-    liste.className = "tests";
-    resultats.forEach((x, i) => {
-      const d = document.createElement("div");
-      d.className = "test " + (x.ok ? "ok" : "ko");
-      d.innerHTML = `<span class="icone">${x.ok ? "✓" : "✗"}</span><span>Test ${i + 1}</span><div class="detail"></div>`;
-      const det = d.querySelector(".detail");
-      if (!x.ok) {
-        if (x.t.entree) det.appendChild(bloc("Entrée clavier", x.t.entree));
-        if (x.t.ajout) det.appendChild(bloc("Appel", x.t.ajout));
-        det.appendChild(bloc("Attendu", x.t.attendu));
-        det.appendChild(bloc("Obtenu", x.r.erreur ? (VERIF.messageErreur(x.r.erreur) || {}).texte || "erreur" : x.r.sortie.replace(/\n+$/, "")));
-      } else det.remove();
-      liste.appendChild(d);
-    });
-    if (resultats.length < exo.tests.length) {
-      const p = document.createElement("p");
-      p.style.margin = "0";
-      p.textContent = "Les autres tests n'ont pas été lancés : corrige d'abord ce problème.";
-      liste.appendChild(p);
-    }
-    boite.appendChild(liste);
-  } else {
-    const idx = EXOS.findIndex(e => e.id === exo.id);
-    const suivant = EXOS.slice(idx + 1).find(e => !S.reussis.has(e.id)) || EXOS.find(e => !S.reussis.has(e.id));
-    const ligne = document.createElement("div");
-    ligne.className = "actions";
-    if (suivant) {
-      const b = document.createElement("button");
-      b.className = "bouton plein";
-      b.type = "button";
-      b.textContent = `Salle suivante : ${suivant.num}. ${suivant.titre}`;
-      b.addEventListener("click", () => choisir(suivant.id));
-      ligne.appendChild(b);
-    } else {
-      const p = document.createElement("p");
-      p.style.margin = "0";
-      p.innerHTML = `🎉 <strong>Mot de passe : ${MOT}.</strong> La porte s'ouvre : tu es sorti·e de la salle informatique ! Dernière étape : fais ton bilan avant l'évaluation.`;
-      ligne.appendChild(p);
-      const b = document.createElement("button");
-      b.className = "bouton plein"; b.type = "button";
-      b.textContent = "Voir mon bilan de compétences";
-      b.addEventListener("click", afficherBilan);
-      ligne.appendChild(b);
-    }
-    boite.appendChild(ligne);
+  if (res.echec) {
+    const e = res.echec, d = document.createElement("div");
+    d.className = "v-test";
+    const bloc = (et, tx) => { const x = document.createElement("div"); x.innerHTML = "<span></span><pre></pre>"; x.querySelector("span").textContent = et; x.querySelector("pre").textContent = tx === "" ? "(rien)" : tx; d.appendChild(x); };
+    if (e.t.entree) bloc("Entrée clavier", e.t.entree);
+    if (e.t.ajout) bloc("Appel", e.t.ajout);
+    bloc("Attendu", e.attendu);
+    bloc("Obtenu", e.r.erreur ? ((VERIF.messageErreur(e.r.erreur) || {}).texte || "erreur") : e.obtenu);
+    boite.appendChild(d);
   }
-  v.appendChild(boite);
-  boite.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "nearest" });
+  v.replaceChildren(boite);
 }
 
-/* ---------- Bilan de compétences ---------- */
-const NIVEAUX = [["oui", "Je sais faire"], ["presque", "Presque"], ["non", "À revoir"]];
-function exosDesModules(ids) {
-  return [...PARCOURS_PY, ...PARCOURS_ALGO].filter(m => ids.includes(m.id)).flatMap(m => m.exercices.map(e => e.id));
+/* ---------- Chronomètre ---------- */
+function tic() {
+  if (!S.debut || S.termine) return;
+  const reste = Math.max(0, S.debut + S.meta.duree * 60000 - maintenant());
+  const m = Math.floor(reste / 60000), s = Math.floor(reste / 1000) % 60;
+  $("ep-chrono").textContent = `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+  $("ep-chrono").classList.toggle("bientot", reste < 5 * 60000);
+  if (reste <= 0) rendre(true);
+}
+
+/* ---------- Surveillance (comme les évaluations) ---------- */
+const NOMS_INCIDENTS = { onglet: "changement d'onglet ou de fenêtre", fenetre: "sortie de la fenêtre", plein_ecran: "sortie du plein écran", reprise: "page rechargée ou rouverte" };
+function incident(type, force) {
+  if (!S.actif || S.termine || S.verrouille || (!force && Date.now() < S.ignorerJusqua)) return;
+  evenement("incident", { type, question: S.actuelle + 1 });
+  verrouiller(type);
+}
+function verrouiller(type, depuisServeur) {
+  S.verrouille = true;
+  sauverLocal();
+  const heure = new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+  $("v-texte").textContent = depuisServeur
+    ? "Ta mission a été bloquée. Lève la main : ton professeur doit venir débloquer ton poste."
+    : `Tu as quitté la mission à ${heure} (${NOMS_INCIDENTS[type] || type}). Lève la main : ton professeur doit venir débloquer ton poste.`;
+  $("v-code").value = "";
+  $("v-erreur").hidden = true;
+  $("verrou").hidden = false;
+}
+document.addEventListener("visibilitychange", () => { if (document.hidden) incident("onglet"); });
+window.addEventListener("blur", () => setTimeout(() => { if (!document.hasFocus()) incident(document.hidden ? "onglet" : "fenetre"); }, 300));
+document.addEventListener("fullscreenchange", () => { if (!document.fullscreenElement) incident("plein_ecran"); });
+window.addEventListener("beforeunload", e => { if (S.actif && !S.termine) { e.preventDefault(); e.returnValue = ""; } });
+["copy", "cut", "paste", "contextmenu", "dragstart", "drop"].forEach(t => document.addEventListener(t, e => { if (S.actif && !S.termine) e.preventDefault(); }, true));
+document.addEventListener("keydown", e => {
+  if (!S.actif || S.termine) return;
+  const k = e.key.toLowerCase(), ctrl = e.ctrlKey || e.metaKey;
+  if (k === "f12" || (ctrl && e.shiftKey && ["i", "j", "c"].includes(k)) || (ctrl && ["u", "s", "p", "v", "c", "x", "o"].includes(k))) {
+    e.preventDefault(); e.stopPropagation();
+  }
+}, true);
+$("b-debloquer").addEventListener("click", async () => {
+  S.ignorerJusqua = Date.now() + 2500;
+  await pleinEcran();
+  const cle = $("v-code").value.trim();
+  $("v-erreur").hidden = true;
+  $("b-debloquer").disabled = true;
+  try {
+    const d = await appelPost({ action: "debloquer", id: S.eleve.id, code: S.eleve.code, evaluation: S.meta.id, cle });
+    if (!d.ok) throw new Error(d.erreur);
+    S.verrouille = false;
+    S.ignorerJusqua = Date.now() + 1500;
+    $("verrou").hidden = true;
+    majCompteur();
+    if (!document.fullscreenElement) { const ok = await pleinEcran(); if (!ok) verrouiller("plein_ecran"); }
+  } catch (e) {
+    $("v-erreur").textContent = e.message === "code_prof" ? "Code incorrect." : "Vérification impossible : connexion Internet ?";
+    $("v-erreur").hidden = false;
+  }
+  $("b-debloquer").disabled = false;
+});
+
+/* ---------- Fin et bilan ---------- */
+function demanderRendu() {
+  const n = S.salles.filter((_, i) => suivi(i).ouvert).length;
+  $("cf-texte").textContent = `Tu as ouvert ${n} verrou${n > 1 ? "s" : ""} sur ${S.salles.length}.`;
+  $("confirmer").hidden = false;
+}
+$("b-annuler").addEventListener("click", () => { $("confirmer").hidden = true; });
+$("b-rendre-ok").addEventListener("click", () => { $("confirmer").hidden = true; rendre(false); });
+function finMission() { rendre(false); }
+
+// Niveau d'une salle : rapide (≤ 2 tentatives, sans indice), avec difficulté, ou pas réussi.
+function niveauSalle(i) {
+  const t = suivi(i);
+  if (!t.ouvert) return "non";
+  return t.essais <= 2 && !t.indices ? "maitrise" : "fragile";
+}
+function pointsSalle(i) {
+  const q = S.salles[i], n = niveauSalle(i), t = suivi(i);
+  if (n === "maitrise") return q.points;
+  if (n === "fragile") return Math.max(q.points / 2, q.points - 0.5 * Math.max(0, t.essais - 2) - 0.5 * t.indices);
+  return Math.round(q.points / 2 * (t.meilleur || 0) * 2) / 2;
+}
+function calculerBilan() {
+  const bilan = {};
+  COMPETENCES.forEach(c => {
+    let salles = S.salles.map((q, i) => q.competences.includes(c.id) ? i : -1).filter(i => i >= 0);
+    let niveaux;
+    if (c.id === "c10") {
+      // Corriger ses erreurs : salles où il y a eu au moins un échec.
+      salles = S.salles.map((_, i) => suivi(i).essais > (suivi(i).ouvert ? 1 : 0) ? i : -1).filter(i => i >= 0);
+      niveaux = salles.map(i => suivi(i).ouvert ? "maitrise" : "non");
+      if (!salles.length) { bilan[c.id] = { niveau: S.salles.some((_, i) => suivi(i).ouvert) ? "acquis" : "travail", salles: [] }; return; }
+    } else niveaux = salles.map(niveauSalle);
+    const niveau = !salles.length ? "travail" : niveaux.every(n => n === "maitrise") ? "acquis" : niveaux.every(n => n === "non") ? "travail" : niveaux.includes("non") && niveaux.filter(n => n === "non").length > niveaux.length / 2 ? "travail" : "encours";
+    bilan[c.id] = { niveau, salles: salles.map(i => i + 1) };
+  });
+  return bilan;
+}
+async function rendre(auto) {
+  if (S.termine || S.rendant) return;
+  S.rendant = true;
+  S.actif = false;
+  if (S.salles[S.actuelle]) S.reponses[S.actuelle] = editeur.getValue();
+  $("verrou").hidden = true;
+  $("confirmer").hidden = true;
+  info("Calcul de ton bilan…", "Ne ferme pas la page.");
+  $("b-reessayer").hidden = true;
+  const details = S.salles.map((q, i) => {
+    const t = suivi(i);
+    return { q: i + 1, v: q.version, points: pointsSalle(i), max: q.points, tests: t.ouvert ? "verrou ouvert" : `${Math.round((t.meilleur || 0) * 100)} % au mieux`, essais: t.essais, indices: t.indices, niveau: NIVEAU_SALLE[niveauSalle(i)] };
+  });
+  const total = details.reduce((a, d) => a + d.points, 0);
+  const max = details.reduce((a, d) => a + d.max, 0);
+  const note20 = max ? Math.round(total / max * 40) / 2 : 0;
+  const bilan = calculerBilan();
+  S.resultat = { total, max, note20, details, bilan };
+  evenement("rendu", { total, max, note20, details, bilan, reponses: S.reponses, auto, fin: maintenant() });
+  info("Envoi de ton bilan…", "Ne ferme pas la page tant que ce message est affiché.");
+  $("b-reessayer").hidden = true;
+}
+function termine() {
+  S.termine = true;
+  local.suppr(cleLocale());
+  if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+  afficherBilan();
+  montrer("ecran-fin");
 }
 function afficherBilan() {
-  if (!S.debloque) return;
-  if (S.exo) { S.codes[S.exo.id] = editeur.getValue(); sauver(); }
-  $("exo-contenu").hidden = true;
-  const p = $("panneau");
-  p.hidden = false;
-  const a = avancement();
-  const auto = local.lire("pybilan:" + S.eleve.id, {});
-  const lignes = COMPETENCES_MISSION.map(c => {
-    const exos = exosDesModules(c.exos), faitsE = exos.filter(x => a.tous.has(x)).length;
-    const faitsS = c.salles.filter(x => S.reussis.has(x)).length;
-    const total = exos.length + c.salles.length, faits = faitsE + faitsS;
-    const etat = !total ? "" : faits === total ? `<span class="etiq ok">Prouvé</span>` : `<span class="etiq encours">En cours</span>`;
-    const preuve = !total ? "à toi de juger" : [exos.length ? `${faitsE}/${exos.length} exercices` : "", c.salles.length ? `${faitsS}/${c.salles.length} salle${c.salles.length > 1 ? "s" : ""}` : ""].filter(Boolean).join(" · ");
-    const radios = NIVEAUX.map(([v, t]) => `<label><input type="radio" name="${c.id}" value="${v}"${auto[c.id] === v ? " checked" : ""}><span>${t}</span></label>`).join("");
-    return `<tr><td>${c.titre}</td><td class="preuve">${preuve}</td><td>${etat}</td><td><div class="auto-eval">${radios}</div></td></tr>`;
+  const r = S.resultat;
+  if (!r) return;
+  const n = S.salles.filter((_, i) => suivi(i).ouvert).length;
+  const mot = S.salles.map((s, i) => suivi(i).ouvert ? s.lettre : "?").join("");
+  const z = $("fin-zone");
+  const lignesComp = COMPETENCES.map(c => {
+    const b = r.bilan[c.id], [cl, lib] = NIVEAU_COMP[b.niveau];
+    return `<tr><td>${esc(c.titre)}<small>${b.salles.length ? "Salle" + (b.salles.length > 1 ? "s " : " ") + b.salles.join(", ") : c.id === "c10" ? "aucune erreur à corriger" : ""}</small></td><td><span class="etiq ${cl}">${lib}</span></td></tr>`;
   }).join("");
-  const nbSalles = EXOS.filter(e => S.reussis.has(e.id)).length;
-  p.innerHTML = `<p class="surtitre">Avant l'évaluation</p><h1>📋 Mon bilan de compétences</h1>
-  <p style="margin:0">${S.eleve.prenom || S.eleve.id}${S.eleve.classe ? " · " + S.eleve.classe : ""} · ${nbSalles} / ${EXOS.length} salles · ${new Date().toLocaleDateString("fr-FR")}</p>
-  <p style="margin:0">Pour chaque compétence, la colonne <strong>Preuves</strong> montre ce que tu as réussi sur le site. Dans la dernière colonne, sois honnête : <strong>est-ce que tu saurais le refaire seul·e, sans indice ?</strong></p>
-  <table class="bilan"><thead><tr><th>Compétence</th><th class="preuve">Preuves</th><th>Site</th><th>Moi</th></tr></thead><tbody>${lignes}</tbody></table>
-  <div class="a-revoir" id="a-revoir"></div>
-  <div class="actions no-print"><button class="bouton" type="button" id="b-imprimer">Imprimer ou enregistrer en PDF</button></div>`;
-  p.querySelectorAll("input[type=radio]").forEach(i => i.addEventListener("change", () => {
-    const v = local.lire("pybilan:" + S.eleve.id, {});
-    v[i.name] = i.value;
-    local.ecrire("pybilan:" + S.eleve.id, v);
-    majARevoir();
-  }));
+  const lignesSalles = S.salles.map((q, i) => {
+    const t = suivi(i), niv = niveauSalle(i);
+    return `<tr><td>Salle ${i + 1} · ${esc(q.titre)}<small>version ${q.version}</small></td><td>${t.ouvert ? "🔓" : "🔒"} ${NIVEAU_SALLE[niv]}</td><td>${t.essais} tentative${t.essais > 1 ? "s" : ""}${t.indices ? ` · ${t.indices} indice${t.indices > 1 ? "s" : ""}` : ""}</td></tr>`;
+  }).join("");
+  const aRevoir = COMPETENCES.filter(c => r.bilan[c.id].niveau !== "acquis");
+  z.innerHTML = `<div class="carte" style="width:100%">
+      <p class="surtitre">Mission finale · ${esc(S.eleve.prenom)} · ${esc(S.eleve.classe)} · ${new Date().toLocaleDateString("fr-FR")}</p>
+      <h1>${n === S.salles.length ? "🎉 Tu es sorti·e ! Mot de passe : " + esc(mot) : `🔓 ${n} verrou${n > 1 ? "s" : ""} ouvert${n > 1 ? "s" : ""} sur ${S.salles.length} · ${esc(mot)}`}</h1>
+      <p style="margin:0">Voici ton <strong>bilan de compétences</strong>, rempli à partir de ce que tu as réussi et du nombre de tentatives. Il a été envoyé à ton professeur. Score de préparation : <strong>${virgule(r.note20)} / 20</strong> (indicatif, ce n'est pas l'évaluation).</p>
+    </div>
+    <div class="a-revoir"><h2>À revoir avant l'évaluation</h2>${aRevoir.length ? `<ul>${aRevoir.map(c => `<li>${esc(c.titre)} : <a href="${c.cours}">relire le cours</a></li>`).join("")}</ul>` : `<p style="margin:0">Tout est acquis : tu es prêt·e. Relis quand même le cours la veille !</p>`}</div>
+    <table class="bilan"><thead><tr><th>Compétence</th><th>Niveau</th></tr></thead><tbody>${lignesComp}</tbody></table>
+    <table class="bilan"><thead><tr><th>Salle</th><th>Résultat</th><th>Tentatives</th></tr></thead><tbody>${lignesSalles}</tbody></table>
+    <p class="doux" style="margin:0">Acquis : toutes les salles concernées réussies en 1 ou 2 tentatives, sans indice. En cours : réussi avec plus de tentatives ou des indices, ou une partie seulement. À travailler : salles concernées pas réussies.</p>
+    <div class="actions no-print"><button class="bouton plein" type="button" id="b-imprimer">Imprimer ou enregistrer en PDF</button><a class="bouton" href="index.html">Retour à l'accueil</a></div>`;
   $("b-imprimer").addEventListener("click", () => window.print());
-  majARevoir();
-  dessinerParcours();
-  $("exo").scrollTop = 0;
 }
-function majARevoir() {
-  const auto = local.lire("pybilan:" + S.eleve.id, {});
-  const a = avancement();
-  const items = COMPETENCES_MISSION.filter(c => {
-    const exos = exosDesModules(c.exos);
-    const incomplet = exos.some(x => !a.tous.has(x)) || c.salles.some(x => !S.reussis.has(x));
-    return auto[c.id] === "non" || auto[c.id] === "presque" || incomplet;
-  });
-  const reste = COMPETENCES_MISSION.filter(c => !auto[c.id]).length;
-  $("a-revoir").innerHTML = `<h2>Ma liste à revoir avant l'évaluation</h2>` + (items.length
-    ? `<ul>${items.map(c => `<li>${c.titre} : <a href="${c.cours}">relire le cours</a></li>`).join("")}</ul>`
-    : reste ? `<p style="margin:0">Remplis la colonne « Moi » pour obtenir ta liste.</p>` : `<p style="margin:0">Rien à revoir : tu es prêt·e pour l'évaluation. Relis quand même le cours la veille !</p>`)
-    + (reste && items.length ? `<p class="manque" style="margin:.5rem 0 0">Il te reste ${reste} ligne(s) à remplir dans la colonne « Moi ».</p>` : "");
-}
-
-/* ---------- Démarrage ---------- */
-document.addEventListener("visibilitychange", () => { if (document.hidden) envoyer(); });
-const msg = local.lire("pyclasse:message", null);
-if (msg && local.lire("pyclasse:session", null)) { local.suppr("pyclasse:message"); $("erreur-connexion").textContent = msg; $("erreur-connexion").hidden = false; }
-initConnexion();
 </script>
 </body>
 </html>

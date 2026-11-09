@@ -207,10 +207,10 @@ main { max-width: 1040px; margin: 0 auto; padding: 1.8rem 16px 4rem; display: gr
       <div>
         <div class="etape">Étape 3 · Défi final</div>
         <h2>Mission finale : escape game</h2>
-        <p>6 verrous à ouvrir en reprenant tout ce que tu as appris, puis ton bilan de compétences avant l'évaluation.</p>
-        <p class="etat-m" id="mission-etat">Se débloque quand tu as réussi tous les algorigrammes et tous les exercices Python.</p>
+        <p>6 verrous à ouvrir seul·e en reprenant tout ce que tu as appris. À la fin, ton bilan de compétences se remplit tout seul.</p>
+        <p class="etat-m" id="mission-etat">Ton professeur l'ouvre en classe, pendant la séance avant l'évaluation : 50 minutes, chacun sur son poste.</p>
       </div>
-      <div class="boutons"><a class="bouton" id="mission-lien" href="mission.html">Voir la mission</a></div>
+      <div class="boutons"><a class="bouton" id="mission-lien" href="mission.html" hidden>Commencer la mission</a></div>
     </section>
 
     <section class="bloc-cours">
@@ -229,7 +229,7 @@ main { max-width: 1040px; margin: 0 auto; padding: 1.8rem 16px 4rem; display: gr
 <script src="config.js?v=20261014d"></script>
 <script src="exercices.js?v=20261014d"></script>
 <script src="algorigrammes.js?v=20261014d"></script>
-<script src="evaluations.js?v=20261014d"></script>
+<script src="evaluations.js?v=20261109b"></script>
 <script>
 "use strict";
 const URL_SERVEUR = (window.CONFIG && CONFIG.url || "").trim();
@@ -256,16 +256,6 @@ function majProgression(session) {
   $("texte-python").textContent = `${py.size} / ${IDS_PY.size} réussis`;
   $("jauge-algo").style.width = (100 * al.size / IDS_ALGO.size) + "%";
   $("texte-algo").textContent = `${al.size} / ${IDS_ALGO.size} réussis`;
-  const ouverte = (py.size === IDS_PY.size && al.size === IDS_ALGO.size) || session.id === "testprof";
-  const m = local.lire("pymission:" + session.id, {});
-  const salles = new Set([...(m.reussis || []), ...reussisServeur].filter(x => /^x\de\d$/.test(x))).size;
-  $("carte-mission").classList.toggle("ferme", !ouverte);
-  $("mission-icone").textContent = !ouverte ? "🔒" : salles >= 6 ? "🏆" : "🔓";
-  $("mission-lien").className = ouverte ? "bouton plein" : "bouton";
-  $("mission-lien").textContent = !ouverte ? "Voir la mission" : salles >= 6 ? "Mon bilan" : salles ? "Continuer la mission" : "Commencer la mission";
-  $("mission-etat").textContent = !ouverte
-    ? `Se débloque quand tu as réussi tous les algorigrammes et tous les exercices Python. Il te reste ${IDS_ALGO.size - al.size + IDS_PY.size - py.size} exercice(s).`
-    : `Débloquée ! ${salles} / 6 verrous ouverts.`;
 }
 
 function etatEval(html, classe) {
@@ -283,8 +273,23 @@ async function verifierEval(session) {
     const ev = d.eval;
     const meta = ev && (window.EVALUATIONS || []).find(e => e.id === ev.id);
     const titre = meta ? meta.titre : "Évaluation";
+    if (ev && ev.rendu && meta && meta.mode === "mission") {
+      etatEval(FERMEE, "ferme");
+      $("mission-icone").textContent = "🏆";
+      $("mission-etat").textContent = "Mission terminée : ton bilan de compétences a été envoyé à ton professeur.";
+      return;
+    }
     if (ev && ev.rendu) {
       etatEval(`<strong></strong><span>Copie rendue.</span>${ev.note != null ? `<span class="note">${String(ev.note).replace(".", ",")} / 20</span>` : ""}`, "rendu");
+    } else if (ev && meta && meta.mode === "mission") {
+      etatEval(FERMEE, "ferme");
+      $("carte-mission").classList.remove("ferme");
+      $("mission-icone").textContent = "🔓";
+      $("mission-etat").textContent = "Ouverte par ton professeur : 50 minutes, chacun sur son poste.";
+      $("mission-lien").hidden = false;
+      $("mission-lien").className = "bouton plein";
+      $("mission-lien").textContent = ev.debut ? "Reprendre la mission" : "Commencer la mission";
+      return;
     } else if (ev) {
       etatEval(`<strong></strong><span>${meta ? meta.duree + " min · " + meta.nb + " questions · " : ""}Attends le signal de ton professeur.</span><a class="bouton plein" href="eval.html">${ev.debut ? "Reprendre l'évaluation" : "Commencer l'évaluation"}</a>`, "ouvert");
     } else { etatEval(FERMEE, "ferme"); return; }
