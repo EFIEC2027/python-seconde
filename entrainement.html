@@ -187,6 +187,15 @@ details.cours summary::-webkit-details-marker { display: none; }
   .eleve { margin-left: 0; }
 }
 </style>
+<style>
+.explication-exo { background: var(--papier); border: 1.5px solid var(--trait); border-radius: 10px; padding: .7rem .9rem; display: grid; gap: .4rem; }
+.explication-exo.piege { border-color: var(--surligne); background: var(--surligne-doux); }
+.explication-exo p { margin: 0; }
+.explication-exo table { border-collapse: collapse; font-size: .92rem; }
+.explication-exo td, .explication-exo th { border: 1px solid var(--trait); padding: .25rem .55rem; text-align: center; font-family: var(--f-code); }
+.explication-exo th { font-family: var(--f-texte); background: var(--fond); }
+.explication-exo .faux { color: var(--ko); }
+</style>
 <link rel="icon" type="image/png" href="logo-efi.png">
 <style>
 .logo-efi { width: 58px; height: 58px; border-radius: 10px; flex-shrink: 0; display: block; }
@@ -695,7 +704,12 @@ function afficherVerdict(exo, reussi, nouveau, regles, resultats, err) {
       liste.appendChild(p);
     }
     boite.appendChild(liste);
+    // Erreur fréquente reconnue : on explique pourquoi.
+    const obtenue = resultats.find(x => !x.ok && !x.r.erreur);
+    const piege = obtenue && (exo.pieges || []).find(pg => VERIF.normaliser(obtenue.r.sortie) === VERIF.normaliser(pg.sortie));
+    if (piege) { const d = document.createElement("div"); d.className = "explication-exo piege"; d.innerHTML = piege.message; boite.appendChild(d); }
   } else {
+    if (exo.explication) { const d = document.createElement("div"); d.className = "explication-exo"; d.innerHTML = "<b>💡 La correction expliquée</b>" + exo.explication; boite.appendChild(d); }
     const idx = EXOS.findIndex(e => e.id === exo.id);
     const suivant = EXOS.slice(idx + 1).find(e => !S.reussis.has(e.id)) || EXOS.find(e => !S.reussis.has(e.id));
     const ligne = document.createElement("div");

@@ -183,7 +183,12 @@ print(prix)</pre>
         tests: [{ entree: "", attendu: "5050" }],
         exige: [{ motif: "\\bfor\\b", message: "Utilise une boucle for." }],
         interdit: [{ motif: "5050", message: "Le résultat doit être calculé par la boucle." }],
-        indices: ["for i in range(1, 101):", "Dans la boucle : somme = somme + i. Affiche somme après la boucle."]
+        indices: ["for i in range(1, 101):", "Dans la boucle : somme = somme + i. Affiche somme après la boucle."],
+        explication: `<p><strong>Pourquoi <code>somme = somme + i</code> et pas <code>somme = somme + 1</code> ?</strong></p>
+<p>On veut ajouter <strong>les nombres</strong> 1, 2, 3, … 100. Or c'est justement <code>i</code> qui prend ces valeurs, une par tour : au 1er tour <code>i</code> vaut 1, au 2e tour 2, et ainsi de suite. Avec <code>+ i</code>, on ajoute donc 1, puis 2, puis 3… Avec <code>+ 1</code>, on ajouterait <strong>toujours 1</strong> : on compterait seulement le nombre de tours, et on trouverait 100 au lieu de 5050.</p>
+<table><tr><th>Tour</th><th>i vaut</th><th>avec somme + i</th><th class="faux">avec somme + 1</th></tr><tr><td>1</td><td>1</td><td>0 + 1 = 1</td><td class="faux">0 + 1 = 1</td></tr><tr><td>2</td><td>2</td><td>1 + 2 = 3</td><td class="faux">1 + 1 = 2</td></tr><tr><td>3</td><td>3</td><td>3 + 3 = 6</td><td class="faux">2 + 1 = 3</td></tr><tr><td>4</td><td>4</td><td>6 + 4 = 10</td><td class="faux">3 + 1 = 4</td></tr><tr><td>…</td><td>…</td><td>…</td><td class="faux">…</td></tr><tr><td>100</td><td>100</td><td><b>5050</b></td><td class="faux"><b>100</b></td></tr></table>
+<p>À retenir : <code>+ 1</code> sert à <strong>compter</strong> (combien de fois ?), <code>+ i</code> sert à <strong>additionner</strong> les valeurs de la boucle.</p>`,
+        pieges: [{ sortie: "100", message: `<p><strong>Ton programme affiche 100 : tu as sûrement écrit <code>somme = somme + 1</code>.</strong> Ça ajoute toujours 1, donc ça compte seulement les tours (il y en a 100). Or on veut ajouter les nombres eux-mêmes : 1, puis 2, puis 3… Quelle variable prend ces valeurs à chaque tour ?</p><table><tr><th>Tour</th><th>i vaut</th><th>avec somme + i</th><th class="faux">avec somme + 1</th></tr><tr><td>1</td><td>1</td><td>0 + 1 = 1</td><td class="faux">0 + 1 = 1</td></tr><tr><td>2</td><td>2</td><td>1 + 2 = 3</td><td class="faux">1 + 1 = 2</td></tr><tr><td>3</td><td>3</td><td>3 + 3 = 6</td><td class="faux">2 + 1 = 3</td></tr><tr><td>4</td><td>4</td><td>6 + 4 = 10</td><td class="faux">3 + 1 = 4</td></tr><tr><td>…</td><td>…</td><td>…</td><td class="faux">…</td></tr><tr><td>100</td><td>100</td><td><b>5050</b></td><td class="faux"><b>100</b></td></tr></table>` }]
       }
     ]
   },
