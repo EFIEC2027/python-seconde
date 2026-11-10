@@ -222,7 +222,7 @@ details.cours summary::-webkit-details-marker { display: none; }
   <header class="barre">
     <img class="logo-efi" src="logo-efi.png" alt="EFI Casablanca">
     <div class="marque" id="marque">Python <span>en seconde</span></div>
-    <nav class="onglets-haut" aria-label="Navigation"><a href="index.html">← Accueil</a><a href="cours.html#python">📖 Cours Python</a></nav>
+    <nav class="onglets-haut" aria-label="Navigation"><a href="index.html">← Accueil</a><a href="entrainement.html">🏋️ Entraînement</a><a href="cours.html#python">📖 Cours Python</a></nav>
     <div class="jauge" title="Exercices réussis">
       <div class="piste"><div class="rempli" id="jauge" style="width:0%"></div></div>
       <span id="jauge-texte">0 / 32</span>
@@ -276,10 +276,12 @@ details.cours summary::-webkit-details-marker { display: none; }
 <script src="config.js?v=20261014d"></script>
 <script src="exercices.js?v=20261014d"></script>
 <script src="verif.js?v=20261014d"></script>
+<script src="commun.js?v=20261110a"></script>
 <script>
 "use strict";
 const URL_SERVEUR = (window.CONFIG && CONFIG.url || "").trim();
 const DEMO = !URL_SERVEUR;
+const ENTR = false, LIEN_ENTR = "entrainement.html";
 const EXOS = PARCOURS.flatMap((m, im) => m.exercices.map((e, ie) => ({ ...e, module: m, num: `${im + 1}.${ie + 1}` })));
 const IDS = new Set(EXOS.map(e => e.id));
 const $ = id => document.getElementById(id);
@@ -373,6 +375,12 @@ setInterval(envoyer, 30000);
 window.addEventListener("online", envoyer);
 
 /* ---------- Connexion ---------- */
+function apresConnexion(d) {
+  S.conseils = d.conseils || [];
+  if (d.ferme && !ENTR) Commun.ferme(LIEN_ENTR);
+  Commun.conseils(document.getElementById("conseils"), S.conseils, EXOS, choisir, S.reussis);
+}
+
 function initConnexion() {
   $("etablissement").textContent = (window.CONFIG && CONFIG.etablissement) || "";
   if (window.CONFIG && CONFIG.titre) document.title = CONFIG.titre;
@@ -415,6 +423,7 @@ function ouvrir(session, serveur) {
   S.file = l.file || [];
   S.temps = l.temps || {};
   if (serveur) {
+    apresConnexion(serveur);
     (serveur.reussis || []).filter(x => IDS.has(x)).forEach(x => S.reussis.add(x));
     Object.entries(serveur.codes || {}).filter(([exo]) => IDS.has(exo)).forEach(([exo, code]) => { S.tentes.add(exo); if (!(exo in S.codes)) S.codes[exo] = code; });
     sauver();
@@ -422,6 +431,7 @@ function ouvrir(session, serveur) {
     // Session reprise : on resynchronise en arrière-plan ce qui a été fait sur un autre poste.
     appelGet({ action: "connexion", id: session.id, code: session.code }).then(d => {
       if (!d.ok) return;
+      apresConnexion(d);
       (d.reussis || []).filter(x => IDS.has(x)).forEach(x => S.reussis.add(x));
       Object.entries(d.codes || {}).filter(([exo]) => IDS.has(exo)).forEach(([exo, code]) => { S.tentes.add(exo); if (!(exo in S.codes)) S.codes[exo] = code; });
       sauver(); dessinerParcours(); majJauge();
@@ -436,7 +446,7 @@ function ouvrir(session, serveur) {
   majJauge();
   majStatut();
   const premier = EXOS.find(e => !S.reussis.has(e.id)) || EXOS[0];
-  choisir(premier.id);
+  if (!Commun.depuisAdresse(EXOS, choisir)) choisir(premier.id);
   envoyer();
 }
 
@@ -624,6 +634,8 @@ async function verifier() {
   envoyer();
 
   afficherVerdict(exo, reussi, nouveau, regles, resultats, premiereErreur);
+  Commun.aide(exo, reussi, { cours: () => { $("cours").open = true; $("cours").scrollIntoView({ block: "start" }); }, entrainement: ENTR ? null : LIEN_ENTR + "#" + exo.module.id.replace(/^[a-z]/, "t") });
+
   if (premiereErreur) {
     $("sortie").className = "";
     $("sortie").textContent = resultats.find(x => x.r.erreur).r.sortie || "(rien n'a été affiché)";

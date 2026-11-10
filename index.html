@@ -173,6 +173,7 @@ main { max-width: 1040px; margin: 0 auto; padding: 1.8rem 16px 4rem; display: gr
     <a href="python.html">Python</a>
     <a href="cours.html#algo">📖 Cours algorigrammes</a>
     <a href="cours.html#python">📖 Cours Python</a>
+    <a href="#entrainement">🏋️ Entraînement</a>
     <a href="#evaluations">Évaluations</a>
   </nav>
   <main>
@@ -239,6 +240,8 @@ main { max-width: 1040px; margin: 0 auto; padding: 1.8rem 16px 4rem; display: gr
 <script src="config.js?v=20261014d"></script>
 <script src="exercices.js?v=20261014d"></script>
 <script src="algorigrammes.js?v=20261014d"></script>
+<script src="entrainement.js?v=20261110a"></script>
+<script src="accueil.js?v=20261110a"></script>
 <script src="evaluations.js?v=20261109c"></script>
 <script>
 "use strict";
@@ -258,7 +261,7 @@ async function appelGet(params) {
 }
 
 /* Progression : ce qui est en mémoire sur ce poste + ce que le serveur connaît (autre poste). */
-let reussisServeur = [];
+let reussisServeur = [], tentesServeur = [], conseilsServeur = [], fermeServeur = false;
 function majProgression(session) {
   const py = new Set([...(local.lire("pyclasse:" + session.id, {}).reussis || []), ...reussisServeur].filter(x => IDS_PY.has(x)));
   const al = new Set([...(local.lire("pyalgo:" + session.id, {}).reussis || []), ...reussisServeur].filter(x => IDS_ALGO.has(x)));
@@ -266,6 +269,21 @@ function majProgression(session) {
   $("texte-python").textContent = `${py.size} / ${IDS_PY.size} réussis`;
   $("jauge-algo").style.width = (100 * al.size / IDS_ALGO.size) + "%";
   $("texte-algo").textContent = `${al.size} / ${IDS_ALGO.size} réussis`;
+  const cles = ["pyclasse:", "pyalgo:", "pyentr:", "pyentralgo:"].map(k => local.lire(k + session.id, {}));
+  const R = new Set([...cles.flatMap(c => c.reussis || []), ...reussisServeur]);
+  const T = new Set([...cles.flatMap(c => c.tentes || []), ...tentesServeur]);
+  Accueil.dessiner({ zone: document.querySelector("#app main"), cle: session.id, reussis: R, tentes: T, conseils: conseilsServeur,
+    parcours: [{ nom: "Algorigrammes", modules: PARCOURS_ALGO, lien: id => "algo.html#" + id }, { nom: "Python", modules: PARCOURS, lien: id => "python.html#" + id }],
+    entrainement: [{ nom: "Python", modules: window.PARCOURS_ENTRAINEMENT || [], lien: "entrainement.html", lienExo: id => "entrainement.html#" + id },
+                   { nom: "Algorigrammes", modules: window.PARCOURS_ENTRAINEMENT_ALGO || [], lien: "entrainement-algo.html", lienExo: id => "entrainement-algo.html#" + id }] });
+  document.querySelectorAll(".carte.algo .bouton.plein, .carte:not(.algo):not(.evals):not(.mission) .bouton.plein").forEach(b => {
+    b.style.pointerEvents = fermeServeur ? "none" : ""; b.style.opacity = fermeServeur ? ".45" : "";
+  });
+  document.querySelectorAll(".ferme-note").forEach(n => n.remove());
+  if (fermeServeur) document.querySelectorAll(".carte.algo .boutons, .carte:not(.algo):not(.evals):not(.mission) .boutons").forEach(z => z.insertAdjacentHTML("beforebegin", '<p class="ferme-note" style="margin:0;color:var(--ko);font-weight:700">🔒 Fermé par ton professeur pour le moment. Tu peux aller dans l\'entraînement.</p>'));
+}
+function depuisServeur(d) {
+  reussisServeur = d.reussis || []; tentesServeur = Object.keys(d.codes || {}); conseilsServeur = d.conseils || []; fermeServeur = !!d.ferme;
 }
 
 function etatEval(html, classe) {
@@ -316,12 +334,12 @@ function ouvrir(session, serveur) {
   $("nom-eleve").textContent = session.prenom || session.id;
   $("classe-eleve").textContent = session.classe ? " · " + session.classe : "";
   $("bonjour").textContent = `Bonjour ${session.prenom || ""} !`.replace("  ", " ");
-  if (serveur) reussisServeur = serveur.reussis || [];
+  if (serveur) depuisServeur(serveur);
   majProgression(session);
   if (!serveur && !DEMO) {
     appelGet({ action: "connexion", id: session.id, code: session.code }).then(d => {
       if (!d.ok) { deconnecter("Ton code a changé. Reconnecte-toi."); return; }
-      reussisServeur = d.reussis || [];
+      depuisServeur(d);
       majProgression(session);
     }).catch(() => {});
   }
