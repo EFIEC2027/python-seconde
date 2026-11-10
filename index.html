@@ -59,6 +59,8 @@ a { color: inherit; }
 .erreur-connexion { color: var(--ko); background: var(--ko-doux); border-radius: 8px; padding: .6rem .8rem; font-size: .95rem; }
 .info-oubli { background: var(--surligne-doux); border-radius: 8px; padding: .6rem .8rem; font-size: .92rem; }
 #b-oubli { justify-self: center; font-size: .92rem; text-decoration: underline; }
+.nouveau-code { display: grid; gap: .8rem; }
+.nouveau-code .info { background: var(--surligne-doux); border-radius: 8px; padding: .6rem .8rem; margin: 0; color: var(--encre); }
 .bandeau-demo { background: var(--surligne-doux); border-radius: 8px; padding: .6rem .8rem; font-size: .9rem; }
 
 /* Accueil */
@@ -147,6 +149,14 @@ main { max-width: 1040px; margin: 0 auto; padding: 1.8rem 16px 4rem; display: gr
     <button class="bouton plein" type="submit" id="b-connexion">Se connecter</button>
     <button class="bouton discret" type="button" id="b-oubli">J'ai oublié mon code</button>
     <div class="info-oubli" id="info-oubli" hidden></div>
+  </form>
+  <form class="carte-connexion nouveau-code" id="form-nouveau" autocomplete="off" hidden>
+    <h1>Choisis <span>ton code</span></h1>
+    <p class="info">Bonjour <strong id="nc-prenom"></strong> ! Tu t'es connecté·e avec un code provisoire. Choisis maintenant <strong>ton code secret à 4 chiffres</strong> : c'est lui que tu utiliseras à chaque connexion. Note-le dans ton cahier.</p>
+    <div class="champ"><label for="nc-code">Mon nouveau code (4 chiffres)</label><input id="nc-code" inputmode="numeric" maxlength="4" required autocomplete="new-password"></div>
+    <div class="champ"><label for="nc-code2">Je le retape</label><input id="nc-code2" inputmode="numeric" maxlength="4" required autocomplete="new-password"></div>
+    <div class="erreur-connexion" id="nc-erreur" hidden></div>
+    <button class="bouton plein" type="submit" id="b-nouveau">Enregistrer mon code</button>
   </form>
 </section>
 
@@ -365,6 +375,7 @@ function initConnexion() {
     try {
       const d = await appelGet({ action: "connexion", id, code });
       if (!d.ok) { err.textContent = "Identifiant ou code incorrect. Vérifie-les avec ton professeur."; err.hidden = false; }
+      else if (d.changer) demanderNouveauCode(id, code, d);
       else ouvrir({ id, code, prenom: d.prenom, classe: d.classe }, d);
     } catch {
       err.textContent = "Connexion impossible. Vérifie que l'ordinateur a accès à Internet, puis réessaie.";
@@ -373,6 +384,27 @@ function initConnexion() {
     $("b-connexion").disabled = false;
     $("b-connexion").textContent = "Se connecter";
   });
+}
+/* ---------- Code provisoire : l'élève choisit le sien ---------- */
+function demanderNouveauCode(id, provisoire, d) {
+  $("form-connexion").hidden = true;
+  $("form-nouveau").hidden = false;
+  $("nc-prenom").textContent = d.prenom || id;
+  $("nc-code").focus();
+  $("form-nouveau").onsubmit = async ev => {
+    ev.preventDefault();
+    const e = $("nc-erreur"), a = $("nc-code").value.trim(), b = $("nc-code2").value.trim();
+    e.hidden = true;
+    if (!/^\d{4}$/.test(a)) { e.textContent = "Ton code doit faire exactement 4 chiffres."; e.hidden = false; return; }
+    if (a !== b) { e.textContent = "Les deux codes ne sont pas pareils. Retape-les."; e.hidden = false; return; }
+    $("b-nouveau").disabled = true;
+    try {
+      const r = await fetch(URL_SERVEUR, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ action: "changerCode", id, code: provisoire, nouveau: a }) }).then(x => x.json());
+      if (r.ok) { $("form-nouveau").hidden = true; ouvrir({ id, code: a, prenom: d.prenom, classe: d.classe }, d); }
+      else { e.textContent = r.erreur === "trop_simple" ? "Ce code est trop facile à deviner (ou c'est le code provisoire). Choisis-en un autre." : "Enregistrement impossible. Réessaie ou appelle ton professeur."; e.hidden = false; }
+    } catch { e.textContent = "Connexion impossible. Vérifie Internet puis réessaie."; e.hidden = false; }
+    $("b-nouveau").disabled = false;
+  };
 }
 // Revenir sur l'onglet met à jour la progression et l'état de l'évaluation.
 window.addEventListener("pageshow", e => { if (e.persisted) location.reload(); });
