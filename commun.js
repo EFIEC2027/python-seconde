@@ -167,8 +167,10 @@
 .anim-division .ad-barre { display: flex; height: 34px; border-radius: 6px; overflow: hidden; border: 1.5px solid var(--encre, #222); }
 .anim-division .ad-paquet { background: var(--accent, #0d6a6a); color: #fff; display: grid; place-items: center; font-size: .78rem; font-weight: 700; border-right: 2px solid var(--papier, #fff); min-width: 0; overflow: hidden; white-space: nowrap; }
 .anim-division .ad-reste { background: var(--surligne, #f2c230); color: #111; display: grid; place-items: center; font-size: .78rem; font-weight: 700; min-width: 2.2rem; }
-.anim-division .ad-calc { display: grid; grid-template-columns: auto 1fr; gap: .15rem .7rem; align-items: baseline; }
-.anim-division .ad-calc code { font-size: .95rem; white-space: nowrap; }
+.anim-division .ad-ligne { display: grid; gap: .2rem; background: var(--fond, #f3f6f6); border-radius: 8px; padding: .45rem .6rem; }
+.anim-division .ad-ligne .ad-code { font-size: 1rem; font-weight: 700; justify-self: start; }
+.anim-division .ad-ligne div { font-size: .93rem; line-height: 1.5; }
+.anim-division .ad-attention { background: var(--ko-doux, #f8e1dc); border-radius: 8px; padding: .45rem .65rem; font-size: .93rem; }
 .anim-division .ad-memoire { display: flex; flex-wrap: wrap; gap: .35rem; }
 .anim-division .ad-memoire span { font-family: var(--f-code, monospace); border: 1.5px solid var(--trait, #ccc); border-radius: 7px; padding: .15rem .5rem; background: var(--code-fond, #f7faf9); }
 .anim-division .ad-memoire span.nouveau { border-color: var(--surligne, #f2c230); background: var(--surligne-doux, #fbf0c8); }
@@ -180,11 +182,22 @@
     (zone || document).querySelectorAll(".anim-division:not([data-pret])").forEach(el => {
       el.dataset.pret = "1";
       const etapes = JSON.parse(el.dataset.etapes);
-      el.innerHTML = `<div class="ad-titre">▶ Comprendre // et % avec des paquets</div><div class="ad-memoire"></div><div class="ad-liste"></div>
+      el.innerHTML = `<div class="ad-titre">▶ Comprendre // et % avec des paquets</div>
+        <div class="ad-attention">⚠️ En Python, <code>%</code> <b>ne veut pas dire « pourcentage »</b>. C'est le signe du <b>reste</b> d'une division (on dit aussi « modulo »). Et <code>//</code> donne le nombre de fois que ça rentre, sans virgule.</div>
+        <div class="ad-memoire"></div><div class="ad-liste"></div>
         <div class="ad-boutons"><button type="button" class="plein ad-suiv">Étape suivante ⏭</button><button type="button" class="ad-zero">↺ Recommencer</button></div>`;
       let n = 0;
       // data-masquer="2" : à partir de l'étape 2, le nom de la variable de départ est remplacé par « ? » (à trouver par l'élève).
       const cache = k => el.dataset.masquer && k + 1 >= Number(el.dataset.masquer);
+      // Une ligne de calcul expliquée : ce que Python remplace, ce qu'il calcule, ce que veut dire le résultat.
+      function ligne(e, k, op, res, sens, couleur) {
+        const nomOp = op === "//" ? "le nombre de paquets complets de" : "ce qui reste après avoir fait les paquets de";
+        const depart = cache(k)
+          ? `→ Le <b>?</b> doit être remplacé par la variable qui contient <b>${e.n}</b> (regarde la mémoire) : c'est à toi de trouver laquelle.`
+          : `→ Python remplace <b>${e.nn}</b> par sa valeur : <code>${e.n} ${op} ${e.d}</code>`;
+        return `<div class="ad-ligne"><code class="ad-code">${op === "//" ? e.q : e.r} = ${cache(k) ? "?" : e.nn} ${op} ${e.d}</code>
+          <div>${depart}<br>→ <code>${e.n} ${op} ${e.d}</code> = <b>${res}</b> : c'est ${nomOp} ${e.d} dans ${e.n} (en ${couleur}).<br>→ Donc <b>${op === "//" ? e.q : e.r}</b> vaut <b>${res}</b> : ${sens}.</div></div>`;
+      }
       function montrer() {
         const liste = el.querySelector(".ad-liste");
         liste.innerHTML = "";
@@ -196,8 +209,8 @@
           liste.insertAdjacentHTML("beforeend", `<div class="ad-etape">
             <div><b>Étape ${k + 1} :</b> dans <b>${e.n}</b>, combien de paquets de <b>${e.d}</b> (${e.paquet}) ? Et combien reste-t-il ?</div>
             <div class="ad-barre">${paquets}<div class="ad-reste" style="flex:${Math.max(r, e.d * .08)}">${r}</div></div>
-            <div class="ad-calc"><code>${e.q} = ${cache(k) ? "?" : e.nn} // ${e.d}</code><span>→ <b>${q}</b> paquet${q > 1 ? "s" : ""} complet${q > 1 ? "s" : ""} (en bleu) : ${e.q} vaut <b>${q}</b></span>
-            <code>${e.r} = ${cache(k) ? "?" : e.nn} % ${e.d}</code><span>→ il reste <b>${r}</b> (en jaune) : ${e.r} vaut <b>${r}</b></span></div></div>`);
+            ${ligne(e, k, "//", q, e.sensq || `le nombre de paquets complets`, "bleu")}
+            ${ligne(e, k, "%", r, e.sensr || `ce qui reste`, "jaune")}</div>`);
         });
         el.querySelector(".ad-memoire").innerHTML = "<b>Mémoire :</b> " + mem.map(([nom, v], i) => `<span class="${i >= mem.length - 2 && n ? "nouveau" : ""}">${nom} = ${v}</span>`).join("");
         el.querySelector(".ad-suiv").disabled = n >= etapes.length;
