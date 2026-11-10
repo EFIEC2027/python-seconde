@@ -80,6 +80,7 @@ print("2 + 3")    # texte : affiche 2 + 3</pre>
 <p>Pour répéter des instructions un nombre connu de fois, on utilise une <strong>boucle for</strong>.</p>
 <pre>for i in range(3):
     print("Salut")</pre>
+<div class="anim-boucle" data-var="i" data-debut="0" data-fin="3" data-corps="print(&quot;Salut&quot;)" data-sortie="'Salut'"></div>
 <p>Les instructions répétées sont <strong>décalées vers la droite</strong> (4 espaces) : c'est l'indentation. Elle est obligatoire.</p>
 <p><code>range(3)</code> donne à <code>i</code> les valeurs 0, 1, 2. <code>range(1, 6)</code> donne 1, 2, 3, 4, 5 : le dernier nombre est exclu.</p>
 <pre>for i in range(1, 4):
@@ -98,11 +99,14 @@ print("2 + 3")    # texte : affiche 2 + 3</pre>
       },
       {
         id: "m2e2", titre: "Compter jusqu'à 10",
-        enonce: "Affiche les nombres de 1 à 10, un par ligne, avec une boucle.",
+        enonce: `<p>Affiche les nombres de <strong>1 à 10</strong>, un par ligne, avec une boucle <code>for</code>.</p>
+<p><strong>Comment ça marche ?</strong> Dans <code>for i in range(1, 4):</code>, la variable <code>i</code> change de valeur à chaque tour : 1, puis 2, puis 3. La ligne décalée en dessous est exécutée une fois par tour, avec la valeur du moment. Regarde ce petit exemple, qui compte seulement jusqu'à 3 :</p>
+<div class="anim-boucle" data-var="i" data-debut="1" data-fin="4" data-corps="print(i)" data-sortie="i"></div>
+<p><strong>À toi :</strong> que faut-il changer dans <code>range(1, 4)</code> pour aller jusqu'à 10 ? Attention, le dernier nombre est <strong>exclu</strong>.</p>`,
         depart: "",
         tests: [{ entree: "", attendu: "1\n2\n3\n4\n5\n6\n7\n8\n9\n10" }],
         exige: [{ motif: "\\bfor\\b", message: "Utilise une boucle for." }],
-        indices: ["range(1, 11) donne les nombres de 1 à 10.", "Dans la boucle, affiche i."]
+        indices: ["Recopie l'exemple de l'animation, puis change seulement le 4.", "range(1, 11) donne les nombres de 1 à 10 (le 11 est exclu).", "for i in range(1, 11):\n    print(i)"]
       },
       {
         id: "m2e3", titre: "Table de 7",

@@ -83,5 +83,79 @@
     });
   }
 
-  global.Commun = { aide, ferme, depuisAdresse, conseils };
+
+  /* ---------- Animation d'une boucle for, pas à pas ----------
+   * <div class="anim-boucle" data-var="i" data-debut="1" data-fin="4" data-pas="1" data-corps="print(i)" data-sortie="i"></div>
+   * data-fin est exclu, comme dans range(). data-sortie : ce qu'affiche le corps (expression avec la variable). */
+  const styleAnim = document.createElement("style");
+  styleAnim.textContent = `
+.anim-boucle { border: 1.5px solid var(--accent, #0d6a6a); border-radius: 12px; padding: .8rem .9rem; margin: .7rem 0; display: grid; gap: .6rem; background: var(--papier, #fff); }
+.anim-boucle .ab-titre { font-weight: 700; color: var(--accent, #0d6a6a); }
+.anim-boucle .ab-grille { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, .7fr) minmax(0, 1fr); gap: .6rem; }
+@media (max-width: 640px) { .anim-boucle .ab-grille { grid-template-columns: 1fr; } }
+.anim-boucle .ab-boite { border: 1px solid var(--trait, #ccc); border-radius: 8px; padding: .5rem .6rem; background: var(--code-fond, #f7faf9); min-height: 5.5rem; }
+.anim-boucle .ab-boite > span { display: block; font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; color: var(--doux, #667); font-weight: 700; margin-bottom: .25rem; }
+.anim-boucle .ab-ligne { font-family: var(--f-code, monospace); padding: .1rem .35rem; border-radius: 5px; white-space: pre; transition: background .2s; }
+.anim-boucle .ab-ligne.on { background: var(--surligne, #f2c230); color: #111; font-weight: 700; }
+.anim-boucle .ab-var { font-family: var(--f-code, monospace); font-size: 1.6rem; font-weight: 700; text-align: center; }
+.anim-boucle .ab-var small { display: block; font-size: .8rem; font-weight: 400; color: var(--doux, #667); font-family: var(--f-texte, sans-serif); }
+.anim-boucle .ab-valeurs { display: flex; flex-wrap: wrap; gap: .25rem; justify-content: center; margin-top: .3rem; }
+.anim-boucle .ab-valeurs b { font-family: var(--f-code, monospace); font-size: .8rem; border: 1.5px solid var(--trait, #ccc); border-radius: 5px; padding: 0 .3rem; opacity: .55; }
+.anim-boucle .ab-valeurs b.fait { opacity: .3; text-decoration: line-through; }
+.anim-boucle .ab-valeurs b.cour { opacity: 1; border-color: var(--surligne, #f2c230); background: var(--surligne-doux, #fbf0c8); }
+.anim-boucle .ab-valeurs b.exclu { border-style: dashed; color: var(--ko, #b93d2a); }
+.anim-boucle pre.ab-sortie { margin: 0; font-family: var(--f-code, monospace); white-space: pre-wrap; min-height: 3rem; background: transparent; border: 0; padding: 0; }
+.anim-boucle .ab-explication { background: var(--surligne-doux, #fbf0c8); border-radius: 8px; padding: .5rem .7rem; min-height: 2.6rem; }
+.anim-boucle .ab-boutons { display: flex; gap: .4rem; flex-wrap: wrap; }
+.anim-boucle .ab-boutons button { font: inherit; font-weight: 700; border: 1.5px solid var(--trait, #ccc); background: var(--papier, #fff); color: inherit; border-radius: 8px; padding: .35rem .8rem; cursor: pointer; }
+.anim-boucle .ab-boutons button.plein { background: var(--accent, #0d6a6a); border-color: var(--accent, #0d6a6a); color: #fff; }`;
+  document.head.appendChild(styleAnim);
+  function animer(zone) {
+    (zone || document).querySelectorAll(".anim-boucle:not([data-pret])").forEach(el => {
+      el.dataset.pret = "1";
+      const v = el.dataset.var || "i", debut = Number(el.dataset.debut || 0), fin = Number(el.dataset.fin), pas = Number(el.dataset.pas || 1);
+      const corps = el.dataset.corps || `print(${v})`, sortie = new Function(v, "return " + (el.dataset.sortie || v));
+      const args = debut === 0 && pas === 1 ? `${fin}` : pas === 1 ? `${debut}, ${fin}` : `${debut}, ${fin}, ${pas}`;
+      const valeurs = []; for (let x = debut; pas > 0 ? x < fin : x > fin; x += pas) valeurs.push(x);
+      el.innerHTML = `<div class="ab-titre">▶ Regarde la boucle tourner, pas à pas</div>
+        <div class="ab-grille">
+          <div class="ab-boite"><span>Le programme</span><div class="ab-ligne" data-l="1">for ${v} in range(${args}):</div><div class="ab-ligne" data-l="2">    ${corps.replace(/</g, "&lt;")}</div><div class="ab-ligne" data-l="3"> </div></div>
+          <div class="ab-boite"><span>La variable</span><div class="ab-var">${v} = <b class="ab-val">?</b><small class="ab-tour">pas encore commencé</small></div><div class="ab-valeurs">${valeurs.map(x => `<b>${x}</b>`).join("")}<b class="exclu" title="le dernier nombre est exclu">${fin}</b></div></div>
+          <div class="ab-boite"><span>Ce qui s'affiche</span><pre class="ab-sortie"></pre></div>
+        </div>
+        <div class="ab-explication">Clique sur <b>Pas suivant</b> pour avancer d'une étape, ou sur <b>Lecture</b> pour tout voir.</div>
+        <div class="ab-boutons"><button type="button" class="plein ab-lire">▶ Lecture</button><button type="button" class="ab-pas">Pas suivant ⏭</button><button type="button" class="ab-zero">↺ Recommencer</button></div>`;
+      // Étapes : test du for (ligne 1) puis corps (ligne 2), pour chaque valeur ; enfin la sortie de boucle.
+      const etapes = [];
+      valeurs.forEach((x, k) => {
+        etapes.push({ l: 1, val: x, k, sortie: null, txt: k === 0 ? `Python lit <code>range(${args})</code> : il prépare les nombres ${valeurs.slice(0, 4).join(", ")}${valeurs.length > 4 ? "…" : ""} (sans le ${fin}). Premier tour : <b>${v}</b> prend la valeur <b>${x}</b>.` : `On remonte au <code>for</code> : il reste des nombres, donc nouveau tour. <b>${v}</b> prend la valeur <b>${x}</b>.` });
+        etapes.push({ l: 2, val: x, k, sortie: String(sortie(x)), txt: `Python exécute la ligne décalée avec ${v} = ${x} : elle affiche <b>${String(sortie(x)).replace(/</g, "&lt;")}</b>.` });
+      });
+      etapes.push({ l: 3, val: valeurs[valeurs.length - 1], k: valeurs.length, sortie: null, fin: true, txt: `Il n'y a plus de nombre dans <code>range(${args})</code> : la boucle s'arrête. Elle a tourné <b>${valeurs.length} fois</b>. Le ${fin} n'est jamais utilisé : <b>le dernier nombre de range est exclu</b>.` });
+      let n = 0, minuteur = null;
+      const $e = s => el.querySelector(s);
+      function montrer() {
+        el.querySelectorAll(".ab-ligne").forEach(l => l.classList.toggle("on", n > 0 && Number(l.dataset.l) === etapes[n - 1].l && etapes[n - 1].l !== 3));
+        const e = etapes[n - 1];
+        $e(".ab-val").textContent = e ? e.val : "?";
+        $e(".ab-tour").textContent = !e ? "pas encore commencé" : e.fin ? "boucle terminée" : `tour ${e.k + 1} sur ${valeurs.length}`;
+        el.querySelectorAll(".ab-valeurs b:not(.exclu)").forEach((b, k) => { b.className = !e ? "" : e.fin || k < e.k ? "fait" : k === e.k ? "cour" : ""; });
+        $e(".ab-sortie").textContent = etapes.slice(0, n).filter(x => x.sortie !== null).map(x => x.sortie).join("\n");
+        $e(".ab-explication").innerHTML = e ? e.txt : "Clique sur <b>Pas suivant</b> pour avancer d'une étape, ou sur <b>Lecture</b> pour tout voir.";
+        $e(".ab-pas").disabled = n >= etapes.length;
+      }
+      const stop = () => { clearInterval(minuteur); minuteur = null; $e(".ab-lire").textContent = "▶ Lecture"; };
+      $e(".ab-pas").addEventListener("click", () => { stop(); if (n < etapes.length) { n++; montrer(); } });
+      $e(".ab-zero").addEventListener("click", () => { stop(); n = 0; montrer(); });
+      $e(".ab-lire").addEventListener("click", () => {
+        if (minuteur) { stop(); return; }
+        if (n >= etapes.length) n = 0;
+        $e(".ab-lire").textContent = "⏸ Pause";
+        minuteur = setInterval(() => { n++; montrer(); if (n >= etapes.length) stop(); }, matchMedia("(prefers-reduced-motion: reduce)").matches ? 1600 : 1100);
+      });
+      montrer();
+    });
+  }
+
+  global.Commun = { aide, ferme, depuisAdresse, conseils, animer };
 })(window);

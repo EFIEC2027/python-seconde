@@ -274,9 +274,9 @@ details.cours summary::-webkit-details-marker { display: none; }
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
 <script src="config.js?v=20261014d"></script>
-<script src="exercices.js?v=20261014d"></script>
+<script src="exercices.js?v=20261110b"></script>
 <script src="verif.js?v=20261014d"></script>
-<script src="commun.js?v=20261110a"></script>
+<script src="commun.js?v=20261110b"></script>
 <script>
 "use strict";
 const URL_SERVEUR = (window.CONFIG && CONFIG.url || "").trim();
@@ -537,6 +537,7 @@ function choisir(id) {
   $("cours-texte").innerHTML = exo.module.cours;
   $("cours").open = exo.num.endsWith(".1") && !S.tentes.has(exo.id);
   $("enonce").innerHTML = exo.enonce;
+  Commun.animer($("enonce")); Commun.animer($("cours-texte"));
   const sauve = S.codes[exo.id];
   editeur.setValue(sauve && sauve.trim() ? sauve : exo.depart);
   editeur.clearHistory();
