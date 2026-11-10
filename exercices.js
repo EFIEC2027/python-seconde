@@ -140,6 +140,8 @@ print(prix)</pre>
 <tr><td><code>/</code></td><td>division (résultat à virgule : 7 / 2 vaut 3.5)</td></tr>
 <tr><td><code>//</code></td><td>quotient entier (7 // 2 vaut 3)</td></tr>
 <tr><td><code>%</code></td><td>reste de la division (7 % 2 vaut 1)</td></tr></table>
+<p>Pour bien comprendre <code>//</code> et <code>%</code>, pense à des <strong>paquets</strong> : <code>17 // 5</code> = combien de paquets de 5 on peut faire avec 17 (3), et <code>17 % 5</code> = ce qui reste (2).</p>
+<div class="anim-division" data-etapes='[{"n":17,"d":5,"nn":"bonbons","q":"paquets","r":"reste","paquet":"un sachet de 5 bonbons"}]' data-fin="17 = 3 × 5 + 2 : 3 sachets complets, et 2 bonbons qui restent."></div>
 <p>Dans une boucle, une variable peut <strong>accumuler</strong> : <code>total = total + i</code>.</p>`,
     exercices: [
       {
@@ -153,11 +155,16 @@ print(prix)</pre>
       },
       {
         id: "m3e2", titre: "Convertir des secondes",
-        enonce: "Une vidéo dure <code>4000</code> secondes. Affiche sa durée sous la forme <code>1 h 6 min 40 s</code>, en utilisant <code>//</code> et <code>%</code>.",
-        depart: "duree = 4000\n",
+        enonce: `<p>Une vidéo dure <code>4000</code> secondes. On veut l'afficher sous la forme <code>1 h 6 min 40 s</code>.</p>
+<p><strong>L'idée :</strong> on range les secondes dans des <strong>paquets</strong>. Un paquet de <strong>3600 s</strong> = 1 heure, un paquet de <strong>60 s</strong> = 1 minute.</p>
+<ul><li><code>a // b</code> (deux barres) donne le <strong>nombre de paquets complets</strong> de b dans a. Exemple : <code>17 // 5</code> vaut <code>3</code> (3 paquets de 5).</li>
+<li><code>a % b</code> (pourcentage) donne <strong>ce qui reste</strong> une fois les paquets faits. Exemple : <code>17 % 5</code> vaut <code>2</code> (17 = 3 × 5 + 2).</li></ul>
+<div class="anim-division" data-etapes='[{"n":4000,"d":3600,"nn":"duree","q":"heures","r":"reste","paquet":"une heure"},{"n":400,"d":60,"nn":"reste","q":"minutes","r":"secondes","paquet":"une minute"}]' data-masquer="2" data-fin="&lt;b&gt;Résultat :&lt;/b&gt; heures = 1, minutes = 6, secondes = 40. Le &lt;code&gt;print&lt;/code&gt; est déjà écrit à la fin du programme."></div>
+<p><strong>À toi :</strong> le début est écrit. Complète les deux lignes avec <code>...</code>. Question à te poser pour le <code>?</code> de l'étape 2 : on fait les paquets de 60 avec <strong>quelle variable</strong> ?</p>`,
+        depart: "duree = 4000\n\n# Étape 1 : les heures (paquets de 3600 s)\nheures = duree // 3600\nreste = duree % 3600\n\n# Étape 2 : avec ce qui reste, les minutes (paquets de 60 s)\nminutes = ...\nsecondes = ...\n\nprint(heures, \"h\", minutes, \"min\", secondes, \"s\")\n",
         tests: [{ entree: "", attendu: "1 h 6 min 40 s" }],
         exige: [{ motif: "//", message: "Utilise le quotient entier //." }, { motif: "%", message: "Utilise le reste %." }],
-        indices: ["Une heure = 3600 s : heures = duree // 3600", "Le reste après les heures : reste = duree % 3600, puis minutes = reste // 60 et secondes = reste % 60."]
+        indices: ["Pour les minutes, on fait des paquets de 60 dans ce qui reste : on part de la variable reste, pas de duree.", "minutes = reste // 60", "secondes = reste % 60"]
       },
       {
         id: "m3e3", titre: "Abonnés",
