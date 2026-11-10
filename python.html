@@ -283,7 +283,7 @@ details.cours summary::-webkit-details-marker { display: none; }
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
 <script src="config.js?v=20261014d"></script>
-<script src="exercices.js?v=20261110g"></script>
+<script src="exercices.js?v=20261110i"></script>
 <script src="verif.js?v=20261014d"></script>
 <script src="commun.js?v=20261110f"></script>
 <script>
@@ -703,8 +703,7 @@ function afficherVerdict(exo, reussi, nouveau, regles, resultats, err) {
     }
     boite.appendChild(liste);
     // Erreur fréquente reconnue : on explique pourquoi.
-    const obtenue = resultats.find(x => !x.ok && !x.r.erreur);
-    const piege = obtenue && (exo.pieges || []).find(pg => VERIF.normaliser(obtenue.r.sortie) === VERIF.normaliser(pg.sortie));
+    const piege = (exo.pieges || []).find(pg => resultats.some(x => !x.ok && !x.r.erreur && VERIF.normaliser(x.r.sortie) === VERIF.normaliser(pg.sortie)));
     if (piege) { const d = document.createElement("div"); d.className = "explication-exo piege"; d.innerHTML = piege.message; boite.appendChild(d); }
   } else {
     if (exo.explication) { const d = document.createElement("div"); d.className = "explication-exo"; d.innerHTML = "<b>💡 La correction expliquée</b>" + exo.explication; boite.appendChild(d); }

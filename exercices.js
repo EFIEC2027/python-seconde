@@ -204,7 +204,8 @@ print("Bonjour", prenom)</pre>
 <pre>n = int(input())
 print(n * 2)</pre>
 <p>Ici, pour tester ton programme, écris ce que l'utilisateur tape dans la case « Entrée clavier » (une valeur par ligne). Lors de la vérification, l'ordinateur essaie plusieurs valeurs.</p>
-<p><code>round(x, 1)</code> arrondit x à 1 chiffre après la virgule.</p>`,
+<p><strong>Arrondir :</strong> <code>round(nombre, chiffres)</code> arrondit un nombre. Le <strong>deuxième nombre</strong>, après la virgule de la parenthèse, dit <strong>combien de chiffres garder après la virgule</strong>.</p>
+<table style="border-collapse:collapse;margin:.4rem 0"><tr><th style="text-align:left;padding:.25rem .8rem .25rem 0">On écrit</th><th style="text-align:left;padding:.25rem .8rem">Résultat</th><th style="text-align:left;padding:.25rem 0">Pourquoi</th></tr><tr><td style="white-space:nowrap;padding:.25rem .8rem .25rem 0"><code>round(12.3456, 0)</code></td><td style="padding:.25rem .8rem"><code>12.0</code></td><td>0 chiffre après la virgule</td></tr><tr><td style="white-space:nowrap;padding:.25rem .8rem .25rem 0"><code>round(12.3456, 1)</code></td><td style="padding:.25rem .8rem"><code>12.3</code></td><td>1 chiffre après la virgule</td></tr><tr><td style="white-space:nowrap;padding:.25rem .8rem .25rem 0"><code>round(12.3456, 2)</code></td><td style="padding:.25rem .8rem"><code>12.35</code></td><td>2 chiffres après la virgule (arrondi au plus proche)</td></tr></table>`,
     exercices: [
       {
         id: "m4e1", titre: "Saluer",
@@ -232,11 +233,21 @@ print(n * 2)</pre>
       },
       {
         id: "m4e4", titre: "Moyenne de trois notes",
-        enonce: "Lis trois notes (une par ligne) et affiche leur moyenne arrondie à 1 décimale avec <code>round(..., 1)</code>.<br>Avec 10, 12 et 14, le programme affiche <code>12.0</code>.",
+        enonce: `<p>Lis trois notes (une par ligne) et affiche leur moyenne <strong>arrondie à 1 chiffre après la virgule</strong>. Avec 10, 12 et 14, le programme affiche <code>12.0</code>.</p>
+<p><strong>Pourquoi arrondir ?</strong> Avec 9, 10 et 10, la moyenne vaut 29 ÷ 3 = <code>9.666666666666666</code> : beaucoup trop de chiffres ! On veut afficher <code>9.7</code>.</p>
+<p><strong>Comment ?</strong> <code>round(moyenne, 1)</code>. Attention, il y a <strong>deux choses dans la parenthèse</strong>, séparées par une virgule :</p>
+<ul><li>d'abord <strong>le nombre à arrondir</strong> : <code>moyenne</code> ;</li><li>ensuite <strong>combien de chiffres garder après la virgule</strong> : <code>1</code>.</li></ul>
+<table style="border-collapse:collapse;margin:.4rem 0"><tr><th style="text-align:left;padding:.25rem .8rem .25rem 0">On écrit</th><th style="text-align:left;padding:.25rem .8rem">Résultat</th><th style="text-align:left;padding:.25rem 0">Pourquoi</th></tr><tr><td style="white-space:nowrap;padding:.25rem .8rem .25rem 0"><code>round(12.3456, 0)</code></td><td style="padding:.25rem .8rem"><code>12.0</code></td><td>0 chiffre après la virgule</td></tr><tr><td style="white-space:nowrap;padding:.25rem .8rem .25rem 0"><code>round(12.3456, 1)</code></td><td style="padding:.25rem .8rem"><code>12.3</code></td><td>1 chiffre après la virgule</td></tr><tr><td style="white-space:nowrap;padding:.25rem .8rem .25rem 0"><code>round(12.3456, 2)</code></td><td style="padding:.25rem .8rem"><code>12.35</code></td><td>2 chiffres après la virgule (arrondi au plus proche)</td></tr></table>
+<p>Ici, <code>1</code> ne veut donc pas dire « un » ou « une note » : c'est <strong>le nombre de chiffres après la virgule</strong> qu'on garde.</p>`,
         depart: "",
         tests: [{ entree: "10\n12\n14", attendu: "12.0" }, { entree: "9\n10\n10", attendu: "9.7" }, { entree: "20\n0\n5", attendu: "8.3" }, { entree: "12.5\n14\n15.5", attendu: "14.0" }],
         exige: [{ motif: "input\\s*\\(", message: "Les notes doivent être lues avec input()." }],
-        indices: ["Une note peut être à virgule : utilise float(input()).", "moyenne = (a + b + c) / 3 puis print(round(moyenne, 1))"]
+        indices: ["Une note peut être à virgule : utilise float(input()) pour chacune des trois notes.", "moyenne = (a + b + c) / 3 : les parenthèses sont obligatoires, sinon seule c est divisée par 3.", "print(round(moyenne, 1))"],
+        explication: `<p><strong><code>print(round(moyenne, 1))</code> se lit de l'intérieur vers l'extérieur :</strong></p>
+<ol><li><code>moyenne</code> vaut par exemple <code>9.666666666666666</code> ;</li><li><code>round(moyenne, 1)</code> l'arrondit en gardant <strong>1 chiffre après la virgule</strong> : <code>9.7</code> ;</li><li><code>print(...)</code> affiche ce résultat.</li></ol>
+<p>Avec <code>round(moyenne, 2)</code>, on aurait <code>9.67</code> ; avec <code>round(moyenne)</code> (sans le 1), on aurait <code>10</code>, un nombre entier.</p>`,
+        pieges: [{ sortie: "9.666666666666666", message: "<p><strong>Ton programme affiche 9.666666666666666 : tu n'as pas arrondi.</strong> Remplace <code>print(moyenne)</code> par <code>print(round(moyenne, 1))</code> : le <code>1</code> veut dire « garde 1 chiffre après la virgule »." },
+                 { sortie: "12", message: "<p><strong>Ton programme affiche un nombre entier (12 au lieu de 12.0) : tu as sûrement écrit <code>round(moyenne)</code> sans le 1.</strong> Sans deuxième nombre, <code>round</code> arrondit à l'entier. Écris <code>round(moyenne, 1)</code> pour garder 1 chiffre après la virgule.</p>" }]
       }
     ]
   },

@@ -705,8 +705,7 @@ function afficherVerdict(exo, reussi, nouveau, regles, resultats, err) {
     }
     boite.appendChild(liste);
     // Erreur fréquente reconnue : on explique pourquoi.
-    const obtenue = resultats.find(x => !x.ok && !x.r.erreur);
-    const piege = obtenue && (exo.pieges || []).find(pg => VERIF.normaliser(obtenue.r.sortie) === VERIF.normaliser(pg.sortie));
+    const piege = (exo.pieges || []).find(pg => resultats.some(x => !x.ok && !x.r.erreur && VERIF.normaliser(x.r.sortie) === VERIF.normaliser(pg.sortie)));
     if (piege) { const d = document.createElement("div"); d.className = "explication-exo piege"; d.innerHTML = piege.message; boite.appendChild(d); }
   } else {
     if (exo.explication) { const d = document.createElement("div"); d.className = "explication-exo"; d.innerHTML = "<b>💡 La correction expliquée</b>" + exo.explication; boite.appendChild(d); }
