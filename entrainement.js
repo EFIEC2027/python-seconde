@@ -1,6 +1,6 @@
 /*
  * Entraînement Python — PAS NOTÉ, pour s'exercer à la maison ou en autonomie.
- * 8 notions × 3 exercices, dans le même ordre que le parcours de classe.
+ * 8 notions, 44 exercices (24 + 20 supplémentaires en fin de fichier), dans le même ordre que le parcours de classe.
  * Les identifiants commencent par « t » : ne les changez plus une fois utilisés.
  */
 window.PARCOURS_ENTRAINEMENT = [
@@ -212,4 +212,119 @@ window.PARCOURS_ENTRAINEMENT = [
           enonce: "<p>La porte est <strong>ouverte</strong> mais l'alarme est <strong>désactivée</strong>. Qu'affiche le système ?</p>",
           choix: ["Calme", "Sirène", "Les deux", "Rien"], bonne: 0, explication: "Avec « et », les deux conditions doivent être vraies. L'alarme est désactivée : branche non.", indices: ["« et » : il faut que les deux soient vraies."] } ] }
   ];
+})();
+
+/* Entraînement Python — exercices supplémentaires (20), ajoutés à la suite de chaque notion. PAS NOTÉ. */
+(function () {
+  const pourFor = [{ motif: "\\bfor\\b", message: "Utilise une boucle for." }];
+  const pourWhile = [{ motif: "\\bwhile\\b", message: "Utilise une boucle while." }];
+  const PLUS = {
+    t1: [
+      { id: "t1e4", titre: "Carte d'anniversaire",
+        enonce: "Affiche exactement ces deux lignes :<pre class=\"sortie\">Joyeux anniversaire !\nTu as 16 ans</pre>Le 16 doit être calculé par Python : 2026 − 2010.",
+        depart: "", tests: [{ entree: "", attendu: "Joyeux anniversaire !\nTu as 16 ans" }],
+        interdit: [{ motif: "\\b16\\b", message: "Fais calculer 2026 - 2010 par Python : n'écris pas 16." }],
+        indices: ["Deux print.", "print(\"Tu as\", 2026 - 2010, \"ans\")"] },
+      { id: "t1e5", titre: "Secondes dans une journée",
+        enonce: "Affiche exactement <code>Une journée dure 86400 secondes</code>, en faisant calculer 24 × 60 × 60 par Python.",
+        depart: "", tests: [{ entree: "", attendu: "Une journée dure 86400 secondes" }],
+        interdit: [{ motif: "86400", message: "Fais calculer 24 * 60 * 60 par Python." }],
+        indices: ["Texte, virgule, calcul, virgule, texte.", "print(\"Une journée dure\", 24 * 60 * 60, \"secondes\")"] }
+    ],
+    t2: [
+      { id: "t2e4", titre: "Compte à rebours",
+        enonce: "Avec une boucle <code>for</code>, affiche les nombres de 10 à 1 (un par ligne), puis <code>Décollage !</code>",
+        depart: "", tests: [{ entree: "", attendu: "10\n9\n8\n7\n6\n5\n4\n3\n2\n1\nDécollage !" }], exige: pourFor,
+        indices: ["range(10, 0, -1) compte à l'envers : 10, 9, … 1.", "Le print(\"Décollage !\") n'est PAS décalé : il est après la boucle."] },
+      { id: "t2e5", titre: "La table de 7",
+        enonce: "Affiche la table de 7, de <code>7 x 1 = 7</code> jusqu'à <code>7 x 10 = 70</code>.",
+        depart: "", tests: [{ entree: "", attendu: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => `7 x ${n} = ${7 * n}`).join("\n") }], exige: pourFor,
+        indices: ["for n in range(1, 11):", "print(\"7 x\", n, \"=\", 7 * n)"] },
+      { id: "t2e6", titre: "La somme de 1 à 100",
+        enonce: "Calcule 1 + 2 + 3 + … + 100 avec une boucle et une variable <code>total</code>, puis affiche le total.",
+        depart: "total = 0\n", tests: [{ entree: "", attendu: "5050" }], exige: pourFor,
+        interdit: [{ motif: "5050", message: "Fais calculer la somme par la boucle." }],
+        indices: ["for i in range(1, 101):", "Dans la boucle : total = total + i. Après la boucle (pas décalé) : print(total)."] }
+    ],
+    t3: [
+      { id: "t3e4", titre: "Les bus de la sortie",
+        enonce: "47 élèves partent en sortie dans des minibus de 12 places. Avec les variables <code>eleves = 47</code> et <code>places = 12</code>, affiche :<pre class=\"sortie\">Minibus pleins : 3\nÉlèves restants : 11</pre>",
+        depart: "eleves = 47\nplaces = 12\n", tests: [{ entree: "", attendu: "Minibus pleins : 3\nÉlèves restants : 11" }],
+        exige: [{ motif: "//", message: "Utilise // pour le quotient entier." }, { motif: "%", message: "Utilise % pour le reste." }],
+        interdit: [{ motif: "\\b11\\b|:\\s*3", message: "Fais calculer les résultats par Python." }],
+        indices: ["eleves // places donne le nombre de minibus pleins.", "eleves % places donne les élèves qui restent."] },
+      { id: "t3e5", titre: "La durée du film",
+        enonce: "Un film dure <code>duree = 135</code> minutes. Affiche sa durée en heures et minutes : <code>2 h 15 min</code>.",
+        depart: "duree = 135\n", tests: [{ entree: "", attendu: "2 h 15 min" }],
+        exige: [{ motif: "//", message: "Utilise // pour les heures." }, { motif: "%", message: "Utilise % pour les minutes qui restent." }],
+        indices: ["Une heure = 60 minutes : duree // 60 donne les heures.", "print(duree // 60, \"h\", duree % 60, \"min\")"] },
+      { id: "t3e6", titre: "Le prix avec la TVA",
+        enonce: "Un casque coûte <code>prix = 250</code> dirhams hors taxes. On ajoute 20 % de TVA. Calcule le prix final dans une variable <code>prix_final</code> et affiche-le.",
+        depart: "prix = 250\n", tests: [{ entree: "", attendu: "300.0" }],
+        interdit: [{ motif: "\\b300\\b", message: "Fais calculer le prix par Python." }],
+        indices: ["20 % de prix, c'est prix * 20 / 100.", "prix_final = prix + prix * 20 / 100"] }
+    ],
+    t4: [
+      { id: "t4e4", titre: "Bonjour !",
+        enonce: "Demande un prénom avec <code>input()</code>, puis affiche <code>Bonjour</code> suivi du prénom et d'un point d'exclamation. Exemple : si on tape Sara, le programme affiche <code>Bonjour Sara !</code>",
+        depart: "", tests: [{ entree: "Sara", attendu: "Bonjour Sara !" }, { entree: "Youssef", attendu: "Bonjour Youssef !" }],
+        indices: ["prenom = input()", "print(\"Bonjour\", prenom, \"!\")"] },
+      { id: "t4e5", titre: "L'an prochain",
+        enonce: "Demande un âge, puis affiche l'âge qu'on aura l'an prochain. Exemple : 15 → <code>16</code>.",
+        depart: "", tests: [{ entree: "15", attendu: "16" }, { entree: "0", attendu: "1" }, { entree: "41", attendu: "42" }],
+        indices: ["input() donne du texte : il faut le convertir en nombre entier.", "age = int(input()) puis print(age + 1)"] },
+      { id: "t4e6", titre: "Le convertisseur",
+        enonce: "1 euro vaut 11 dirhams. Demande une somme en euros (elle peut avoir une virgule, tapée avec un point : 2.5), puis affiche la somme en dirhams.",
+        depart: "", tests: [{ entree: "10", attendu: "110.0" }, { entree: "2.5", attendu: "27.5" }, { entree: "0", attendu: "0.0" }],
+        indices: ["Un nombre à virgule se convertit avec float().", "euros = float(input()) puis print(euros * 11)"] }
+    ],
+    t5: [
+      { id: "t5e4", titre: "Pair ou impair",
+        enonce: "Demande un nombre entier. Affiche <code>pair</code> s'il est pair, <code>impair</code> sinon.",
+        depart: "", tests: [{ entree: "4", attendu: "pair" }, { entree: "7", attendu: "impair" }, { entree: "0", attendu: "pair" }, { entree: "13", attendu: "impair" }],
+        indices: ["Un nombre est pair si le reste de sa division par 2 vaut 0.", "if n % 2 == 0:"] },
+      { id: "t5e5", titre: "Le permis de conduire",
+        enonce: "Demande un âge. À partir de 18 ans, affiche <code>Tu peux passer le permis</code>. Sinon, affiche le nombre d'années à attendre, par exemple <code>Encore 3 ans</code> pour 15 ans.",
+        depart: "", tests: [{ entree: "20", attendu: "Tu peux passer le permis" }, { entree: "18", attendu: "Tu peux passer le permis" }, { entree: "15", attendu: "Encore 3 ans" }, { entree: "16", attendu: "Encore 2 ans" }],
+        indices: ["if age >= 18: (attention à 18 pile !)", "Dans le else : print(\"Encore\", 18 - age, \"ans\")"] },
+      { id: "t5e6", titre: "Le code du casier",
+        enonce: "Demande un code. Si c'est <code>4821</code>, affiche <code>Casier ouvert</code>, sinon <code>Code faux</code>.",
+        depart: "", tests: [{ entree: "4821", attendu: "Casier ouvert" }, { entree: "1234", attendu: "Code faux" }, { entree: "48210", attendu: "Code faux" }],
+        indices: ["On peut comparer le texte directement : if code == \"4821\":", "Deux signes = pour comparer."] }
+    ],
+    t6: [
+      { id: "t6e4", titre: "La mention au bac",
+        enonce: "Demande une note (elle peut avoir une virgule). Affiche la mention : 16 ou plus <code>Très bien</code>, 14 ou plus <code>Bien</code>, 12 ou plus <code>Assez bien</code>, 10 ou plus <code>Admis</code>, sinon <code>Refusé</code>.",
+        depart: "", tests: [{ entree: "17", attendu: "Très bien" }, { entree: "16", attendu: "Très bien" }, { entree: "14", attendu: "Bien" }, { entree: "12.5", attendu: "Assez bien" }, { entree: "10", attendu: "Admis" }, { entree: "8", attendu: "Refusé" }],
+        exige: [{ motif: "\\belif\\b", message: "Utilise elif." }],
+        indices: ["note = float(input())", "Commence par le cas le plus haut : if note >= 16: … elif note >= 14: …"] },
+      { id: "t6e5", titre: "Le tarif du cinéma",
+        enonce: "Demande un âge. Moins de 12 ans ou 65 ans et plus : <code>Tarif réduit : 30 DH</code>. Sinon : <code>Plein tarif : 60 DH</code>.",
+        depart: "", tests: [{ entree: "8", attendu: "Tarif réduit : 30 DH" }, { entree: "70", attendu: "Tarif réduit : 30 DH" }, { entree: "65", attendu: "Tarif réduit : 30 DH" }, { entree: "12", attendu: "Plein tarif : 60 DH" }, { entree: "30", attendu: "Plein tarif : 60 DH" }],
+        exige: [{ motif: "\\bor\\b", message: "Utilise or pour réunir les deux cas." }],
+        indices: ["if age < 12 or age >= 65:", "Attention : 12 ans paie plein tarif, 65 ans paie le tarif réduit."] }
+    ],
+    t7: [
+      { id: "t7e4", titre: "Diviser par 2",
+        enonce: "Demande un nombre entier. Tant qu'il est plus grand que 1, on le divise par 2 (division entière <code>//</code>). Affiche combien de divisions on a faites. Exemple : 8 → 4 → 2 → 1, donc <code>3</code>.",
+        depart: "", tests: [{ entree: "8", attendu: "3" }, { entree: "1", attendu: "0" }, { entree: "100", attendu: "6" }, { entree: "2", attendu: "1" }],
+        exige: pourWhile, indices: ["Il faut un compteur : c = 0 avant la boucle.", "while n > 1: puis n = n // 2 et c = c + 1"] },
+      { id: "t7e5", titre: "Le total des courses",
+        enonce: "On tape des prix, un par un. Quand on tape <code>0</code>, c'est fini : affiche le total. Exemple : 12, 8.5 puis 0 → <code>20.5</code>.",
+        depart: "total = 0\n", tests: [{ entree: "12\n8.5\n0", attendu: "20.5" }, { entree: "0", attendu: "0" }, { entree: "5\n5\n5\n0", attendu: "15.0" }],
+        exige: pourWhile, indices: ["Lis un premier prix AVANT la boucle : prix = float(input())", "while prix != 0: ajoute le prix au total, puis lis le prix suivant."] }
+    ],
+    t8: [
+      { id: "t8e4", titre: "Le carré",
+        enonce: "Écris une fonction <code>carre(n)</code> qui renvoie n × n.",
+        depart: "def carre(n):\n    ", tests: [{ ajout: "print(carre(3))", attendu: "9" }, { ajout: "print(carre(-4))", attendu: "16" }, { ajout: "print(carre(0))", attendu: "0" }],
+        exige: [{ motif: "def\\s+carre\\s*\\(", message: "La fonction doit s'appeler carre." }, { motif: "\\breturn\\b", message: "Utilise return." }], indices: ["return n * n"] },
+      { id: "t8e5", titre: "Le prix en solde",
+        enonce: "Écris une fonction <code>solde(prix, remise)</code> qui renvoie le prix après une remise en pourcentage. Exemple : <code>solde(200, 25)</code> renvoie <code>150.0</code>.",
+        depart: "def solde(prix, remise):\n    ", tests: [{ ajout: "print(solde(200, 25))", attendu: "150.0" }, { ajout: "print(solde(80, 50))", attendu: "40.0" }, { ajout: "print(solde(99, 0))", attendu: "99.0" }],
+        exige: [{ motif: "def\\s+solde\\s*\\(", message: "La fonction doit s'appeler solde." }, { motif: "\\breturn\\b", message: "Utilise return." }],
+        indices: ["La remise vaut prix * remise / 100.", "return prix - prix * remise / 100"] }
+    ]
+  };
+  (window.PARCOURS_ENTRAINEMENT || []).forEach(m => (PLUS[m.id] || []).forEach(e => { if (!m.exercices.some(x => x.id === e.id)) m.exercices.push(e); }));
 })();
