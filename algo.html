@@ -154,6 +154,7 @@ details.cours summary::-webkit-details-marker { display: none; }
 .indice { background: var(--surligne-doux); border-radius: 8px; padding: .7rem .9rem; }
 .indice b { font-family: var(--f-titre); }
 .indice pre { margin: .3rem 0 0; white-space: pre-wrap; }
+.choix-code { white-space: pre; font-family: var(--f-code, ui-monospace, monospace); font-size: .9rem; overflow-x: auto; }
 
 .verdict { border-radius: var(--rayon); padding: 1rem 1.1rem; display: grid; gap: .8rem; }
 .verdict.reussi { background: var(--ok-doux); border: 1.5px solid var(--ok); }
@@ -631,7 +632,7 @@ function choisir(id) {
       const r = document.createElement("input");
       r.type = "radio"; r.name = "qcm"; r.id = "choix-" + k; r.checked = choisi === c;
       r.addEventListener("change", () => { memoriser(c); zone.querySelectorAll(".choix").forEach(x => x.classList.toggle("coche", x.contains(r))); });
-      const t = document.createElement("span"); t.textContent = c;
+      const t = document.createElement("span"); t.textContent = c; if (c.includes("\n")) t.className = "choix-code";
       l.append(r, t);
       zone.appendChild(l);
     });

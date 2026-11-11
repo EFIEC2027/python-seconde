@@ -157,7 +157,7 @@ window.PARCOURS_ENTRAINEMENT = [
   }
 ];
 
-/* Entraînement algorigrammes — PAS NOTÉ. 5 notions × 2 exercices (identifiants « u »). */
+/* Entraînement algorigrammes — PAS NOTÉ. 5 notions, 30 exercices (10 + 20 supplémentaires en fin de fichier, identifiants « u »). */
 (function () {
   const DEBUT = { t: "debut" }, FIN = { t: "fin" };
   const act = (txt, trou) => ({ t: "action", txt, trou });
@@ -327,4 +327,93 @@ window.PARCOURS_ENTRAINEMENT = [
     ]
   };
   (window.PARCOURS_ENTRAINEMENT || []).forEach(m => (PLUS[m.id] || []).forEach(e => { if (!m.exercices.some(x => x.id === e.id)) m.exercices.push(e); }));
+})();
+
+/* Entraînement algorigrammes — exercices supplémentaires (20), ajoutés à la suite de chaque notion. PAS NOTÉ. */
+(function () {
+  const DEBUT = { t: "debut" }, FIN = { t: "fin" };
+  const act = (txt, trou) => ({ t: "action", txt, trou });
+  const es = (txt, trou) => ({ t: "es", txt, trou });
+  const si = (txt, oui, non, trou) => ({ t: "si", txt, oui, non, trou });
+  const tantque = (txt, corps, trou) => ({ t: "tantque", txt, corps, trou });
+  const PLUS = {
+    u1: [
+      { id: "u1e3", titre: "Début et fin", type: "qcm", enonce: "<p>Quel symbole utilise-t-on pour <strong>Début</strong> et <strong>Fin</strong> ?</p>",
+        choix: ["L'ovale", "Le losange", "Le rectangle", "Le parallélogramme"], bonne: 0, explication: "Début et Fin se dessinent dans un ovale (symbole terminal).", indices: ["C'est une forme arrondie."] },
+      { id: "u1e4", titre: "Que calcule-t-il ?", type: "qcm", schema: [DEBUT, es("Lire a"), es("Lire b"), act("s ← a + b"), act("m ← s ÷ 2"), es("Afficher m"), FIN],
+        enonce: "<p>Que fait cet algorigramme ?</p>", choix: ["Il affiche la moyenne de deux nombres", "Il affiche la somme de deux nombres", "Il affiche le plus grand des deux nombres", "Il affiche a puis b"], bonne: 0,
+        explication: "On additionne a et b, puis on divise par 2 : c'est la moyenne.", indices: ["Que vaut s ? Que fait-on ensuite de s ?"] },
+      { id: "u1e5", titre: "Combien de tests ?", type: "suivre", schema: [DEBUT, es("Lire t"), si("t > 25 ?", [es("Afficher \"chaud\"")], [si("t < 10 ?", [es("Afficher \"froid\"")], [es("Afficher \"doux\"")])]), FIN],
+        enonce: "<p>Compte les losanges de cet algorigramme.</p>", question: "Combien y a-t-il de tests ? Réponds par un nombre.", attendu: "2",
+        explication: "Il y a deux losanges : t > 25 ? et t < 10 ?. Le deuxième n'est lu que si le premier répond non.", indices: ["Un test = un losange."] },
+      { id: "u1e6", titre: "Algorigramme → Python", type: "qcm", schema: [DEBUT, es("Lire n"), act("n ← n × 3"), es("Afficher n"), FIN],
+        enonce: "<p>Quel programme Python correspond à cet algorigramme ?</p>",
+        choix: ["n = int(input())\nn = n * 3\nprint(n)", "n = int(input())\nprint(n)\nn = n * 3", "n = 3\nprint(n * 3)", "print(int(input()))"], bonne: 0,
+        explication: "Lire n → n = int(input()) ; n ← n × 3 → n = n * 3 ; Afficher n → print(n), dans le même ordre.", indices: ["Chaque case donne une ligne Python, dans l'ordre des flèches."] }
+    ],
+    u2: [
+      { id: "u2e3", titre: "L'échange", type: "suivre", schema: [DEBUT, act("a ← 4"), act("b ← 9"), act("c ← a"), act("a ← b"), act("b ← c"), es("Afficher a"), FIN],
+        enonce: "<p>Fais tourner l'algorigramme à la main en notant a, b et c.</p>", question: "Qu'affiche-t-il ?", attendu: "9",
+        explication: "c garde 4, a prend 9, b prend 4 : on a échangé a et b. On affiche a = 9.", indices: ["Fais un tableau a | b | c.", "Après c ← a, c vaut 4."] },
+      { id: "u2e4", titre: "Le temps de trajet", type: "suivre", schema: [DEBUT, es("Lire minutes"), act("h ← quotient de minutes ÷ 60"), act("m ← reste de minutes ÷ 60"), es("Afficher h, m"), FIN],
+        enonce: "<p>L'utilisateur tape <strong>150</strong>.</p>", question: "Qu'affiche l'algorigramme ? (deux nombres séparés par une virgule)", attendu: "2, 30", accepte: ["2,30", "2 30", "2 , 30"],
+        explication: "150 = 2 × 60 + 30 : quotient 2, reste 30.", indices: ["Combien de fois 60 dans 150 ?", "Que reste-t-il ?"] },
+      { id: "u2e5", titre: "Compléter : la moyenne", type: "completer", schema: [DEBUT, es("Lire n1"), es("Lire n2"), es("Lire n3"), act("", "A"), es("Afficher moy"), FIN],
+        enonce: "<p>L'algorigramme doit afficher la moyenne de trois notes. Que faut-il écrire en <strong>A</strong> ?</p>",
+        trous: { A: { choix: ["moy ← (n1 + n2 + n3) ÷ 3", "moy ← n1 + n2 + n3 ÷ 3", "moy ← (n1 + n2 + n3) ÷ 2", "Afficher n1 + n2 + n3"], bonne: 0 } },
+        explication: "Il faut des parenthèses : on additionne d'abord les trois notes, puis on divise par 3.", indices: ["Sans parenthèses, la division se fait avant l'addition."] },
+      { id: "u2e6", titre: "Dans le bon ordre", type: "completer", schema: [DEBUT, es("", "A"), act("", "B"), es("Afficher aire"), FIN],
+        enonce: "<p>L'algorigramme doit afficher l'aire d'un carré dont on tape le côté. Complète les cases <strong>A</strong> et <strong>B</strong>.</p>",
+        trous: { A: { choix: ["Lire cote", "Afficher cote", "aire ← cote × cote"], bonne: 0 }, B: { choix: ["aire ← cote × cote", "Lire cote", "aire ← cote × 4"], bonne: 0 } },
+        explication: "On lit d'abord le côté, puis on calcule l'aire (côté × côté), enfin on l'affiche.", indices: ["On ne peut pas calculer avant d'avoir lu.", "Aire d'un carré = côté × côté (4 × côté, c'est le périmètre)."] }
+    ],
+    u3: [
+      { id: "u3e3", titre: "La note", type: "suivre", schema: [DEBUT, es("Lire note"), si("note ≥ 10 ?", [es("Afficher \"Admis\"")], [es("Afficher \"Refusé\"")]), FIN],
+        enonce: "<p>L'utilisateur tape <strong>10</strong>.</p>", question: "Qu'affiche l'algorigramme ?", attendu: "Admis", accepte: ["\"Admis\""],
+        explication: "≥ veut dire « plus grand ou égal » : 10 ≥ 10 est vrai, branche oui.", indices: ["10 est-il plus grand OU ÉGAL à 10 ?"] },
+      { id: "u3e4", titre: "Trois cas", type: "suivre", schema: [DEBUT, es("Lire t"), si("t > 25 ?", [es("Afficher \"chaud\"")], [si("t < 10 ?", [es("Afficher \"froid\"")], [es("Afficher \"doux\"")])]), FIN],
+        enonce: "<p>Le capteur mesure <strong>10</strong> °C.</p>", question: "Qu'affiche l'algorigramme ?", attendu: "doux", accepte: ["\"doux\""],
+        explication: "10 > 25 est faux, puis 10 < 10 est faux : on arrive à « doux ».", indices: ["Réponds aux deux tests l'un après l'autre."] },
+      { id: "u3e5", titre: "Compléter : le parc d'attractions", type: "completer", schema: [DEBUT, es("Lire taille"), si("", [es("Afficher \"Accès autorisé\"")], [es("Afficher \"Accès refusé\"")], "A"), FIN],
+        enonce: "<p>Il faut mesurer <strong>au moins 1,40 m</strong> pour monter. Que faut-il écrire dans le losange <strong>A</strong> ?</p>",
+        trous: { A: { choix: ["taille ≥ 1,40 ?", "taille > 1,40 ?", "taille < 1,40 ?", "taille = 1,40 ?"], bonne: 0 } },
+        explication: "« Au moins 1,40 m » : 1,40 m pile est accepté, donc ≥.", indices: ["Quelqu'un qui mesure exactement 1,40 m peut-il monter ?"] },
+      { id: "u3e6", titre: "Algorigramme → Python", type: "qcm", schema: [DEBUT, es("Lire age"), si("age ≥ 18 ?", [es("Afficher \"majeur\"")], [es("Afficher \"mineur\"")]), FIN],
+        enonce: "<p>Quel programme Python correspond à cet algorigramme ?</p>",
+        choix: ["age = int(input())\nif age >= 18:\n    print(\"majeur\")\nelse:\n    print(\"mineur\")", "age = int(input())\nif age > 18:\n    print(\"majeur\")\nelse:\n    print(\"mineur\")", "age = int(input())\nif age >= 18:\n    print(\"majeur\")\nprint(\"mineur\")", "age = input()\nif age = 18:\n    print(\"majeur\")"], bonne: 0,
+        explication: "≥ s'écrit >= ; la branche non devient else. Sans else, « mineur » s'afficherait toujours.", indices: ["Comment écrit-on ≥ en Python ?", "Que devient la branche non ?"] }
+    ],
+    u4: [
+      { id: "u4e3", titre: "La somme", type: "suivre", schema: [DEBUT, act("s ← 0"), act("i ← 1"), tantque("i ≤ 4 ?", [act("s ← s + i"), act("i ← i + 1")]), es("Afficher s"), FIN],
+        enonce: "<p>Fais tourner la boucle à la main en notant i et s à chaque tour.</p>", question: "Qu'affiche l'algorigramme ?", attendu: "10",
+        explication: "s = 0 + 1 + 2 + 3 + 4 = 10. Quand i vaut 5, le test est faux.", indices: ["Tableau i | s.", "Tour 1 : s = 1, tour 2 : s = 3…"] },
+      { id: "u4e4", titre: "Combien de tours ?", type: "suivre", schema: [DEBUT, act("x ← 1"), act("tours ← 0"), tantque("x < 100 ?", [act("x ← x × 3"), act("tours ← tours + 1")]), es("Afficher tours"), FIN],
+        enonce: "<p>x est multiplié par 3 à chaque tour.</p>", question: "Qu'affiche l'algorigramme ?", attendu: "5",
+        explication: "x vaut 1, 3, 9, 27, 81, puis 243 : 5 tours.", indices: ["Écris les valeurs de x : 1, 3, 9…", "81 < 100 est encore vrai."] },
+      { id: "u4e5", titre: "Réparer la boucle sans fin", type: "completer", schema: [DEBUT, act("n ← 5"), tantque("n > 0 ?", [es("Afficher n"), act("", "A")]), es("Afficher \"Partez !\""), FIN],
+        enonce: "<p>Ce compte à rebours ne s'arrête jamais. Que faut-il écrire en <strong>A</strong> pour afficher 5, 4, 3, 2, 1 puis « Partez ! » ?</p>",
+        trous: { A: { choix: ["n ← n − 1", "n ← n + 1", "n ← 0", "Afficher n − 1"], bonne: 0 } },
+        explication: "n doit diminuer à chaque tour pour que n > 0 devienne faux.", indices: ["Qu'est-ce qui doit changer pour que la boucle s'arrête ?"] },
+      { id: "u4e6", titre: "Algorigramme → Python", type: "qcm", schema: [DEBUT, act("i ← 0"), tantque("i < 3 ?", [es("Afficher i"), act("i ← i + 1")]), FIN],
+        enonce: "<p>Quel programme Python correspond à cet algorigramme ?</p>",
+        choix: ["i = 0\nwhile i < 3:\n    print(i)\n    i = i + 1", "i = 0\nwhile i < 3:\n    print(i)\ni = i + 1", "i = 0\nif i < 3:\n    print(i)\n    i = i + 1", "while i < 3:\n    print(i)"], bonne: 0,
+        explication: "« Tant que » devient while ; les deux cases de la boucle sont décalées sous le while.", indices: ["Une boucle tant que = while.", "Que se passe-t-il si i = i + 1 n'est pas décalé ?"] }
+    ],
+    u5: [
+      { id: "u5e3", titre: "Le thermostat", type: "suivre", schema: [DEBUT, es("Lire temp"), si("temp < 19 ?", [es("Afficher \"Chauffage ON\"")], [es("Afficher \"Chauffage OFF\"")]), FIN],
+        enonce: "<p>Le capteur mesure <strong>19</strong> °C.</p>", question: "Qu'affiche le système ?", attendu: "Chauffage OFF", accepte: ["\"Chauffage OFF\"", "chauffage off", "OFF"],
+        explication: "19 < 19 est faux : branche non.", indices: ["19 est-il STRICTEMENT plus petit que 19 ?"] },
+      { id: "u5e4", titre: "La lampe automatique", type: "qcm", schema: [DEBUT, es("Lire présence"), es("Lire luminosité"), si("présence ou luminosité < 20 ?", [es("Allumer lampe")], [es("Éteindre lampe")]), FIN],
+        enonce: "<p>Il n'y a <strong>personne</strong>, mais il fait <strong>nuit</strong> (luminosité 5). Que fait la lampe ?</p>",
+        choix: ["Elle s'allume", "Elle s'éteint", "Elle clignote", "Rien"], bonne: 0, explication: "Avec « ou », une seule condition vraie suffit : 5 < 20 est vrai.", indices: ["« ou » : il suffit qu'une des deux soit vraie."] },
+      { id: "u5e5", titre: "Le parking", type: "suivre", schema: [DEBUT, act("places ← 3"), tantque("places > 0 ?", [es("Lire voiture"), act("places ← places − 1")]), es("Afficher \"COMPLET\""), FIN],
+        enonce: "<p>Le parking a 3 places. Une voiture entre à chaque tour de boucle.</p>", question: "Combien de voitures entrent avant que « COMPLET » s'affiche ? Réponds par un nombre.", attendu: "3",
+        explication: "places vaut 3, 2, 1 : trois voitures entrent. À 0, on sort et on affiche COMPLET.", indices: ["Note la valeur de places à chaque tour."] },
+      { id: "u5e6", titre: "Compléter : la serre", type: "completer", schema: [DEBUT, es("Lire temp"), si("temp > 30 ?", [es("", "A")], [es("Fermer la fenêtre")]), FIN],
+        enonce: "<p>Dans une serre connectée, s'il fait plus de 30 °C, il faut aérer. Que faut-il écrire en <strong>A</strong> ?</p>",
+        trous: { A: { choix: ["Ouvrir la fenêtre", "Fermer la fenêtre", "Lire temp", "Allumer le chauffage"], bonne: 0 } },
+        explication: "Branche oui = il fait trop chaud : on ouvre la fenêtre pour aérer.", indices: ["La branche oui correspond à « il fait plus de 30 °C »."] }
+    ]
+  };
+  (window.PARCOURS_ENTRAINEMENT_ALGO || []).forEach(m => (PLUS[m.id] || []).forEach(e => { if (!m.exercices.some(x => x.id === e.id)) m.exercices.push(e); }));
 })();

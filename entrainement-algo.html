@@ -154,6 +154,7 @@ details.cours summary::-webkit-details-marker { display: none; }
 .indice { background: var(--surligne-doux); border-radius: 8px; padding: .7rem .9rem; }
 .indice b { font-family: var(--f-titre); }
 .indice pre { margin: .3rem 0 0; white-space: pre-wrap; }
+.choix-code { white-space: pre; font-family: var(--f-code, ui-monospace, monospace); font-size: .9rem; overflow-x: auto; }
 
 .verdict { border-radius: var(--rayon); padding: 1rem 1.1rem; display: grid; gap: .8rem; }
 .verdict.reussi { background: var(--ok-doux); border: 1.5px solid var(--ok); }
@@ -316,7 +317,7 @@ table.trace th { background: var(--fond); font-size: .85rem; }
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
 <script src="config.js?v=20261014d"></script>
-<script src="entrainement.js?v=20261111a"></script>
+<script src="entrainement.js?v=20261111b"></script>
 <script src="schema.js?v=20261014d"></script>
 <script>window.PARCOURS = window.PARCOURS_ENTRAINEMENT_ALGO;</script>
 <script src="verif.js?v=20261014d"></script>
@@ -632,7 +633,7 @@ function choisir(id) {
       const r = document.createElement("input");
       r.type = "radio"; r.name = "qcm"; r.id = "choix-" + k; r.checked = choisi === c;
       r.addEventListener("change", () => { memoriser(c); zone.querySelectorAll(".choix").forEach(x => x.classList.toggle("coche", x.contains(r))); });
-      const t = document.createElement("span"); t.textContent = c;
+      const t = document.createElement("span"); t.textContent = c; if (c.includes("\n")) t.className = "choix-code";
       l.append(r, t);
       zone.appendChild(l);
     });
