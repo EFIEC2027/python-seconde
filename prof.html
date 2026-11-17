@@ -157,6 +157,7 @@ select#choix-eleve { border: 1.5px solid var(--trait); border-radius: 8px; paddi
 </style>
 <link rel="icon" type="image/png" href="logo-efi.png">
 <style>
+#bloques.calme { background: #e3f4ea; border-bottom-color: #1d7a46; }
 #bloques { position: sticky; top: 0; z-index: 20; display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; padding: .7rem 1rem; background: #fdecea; border-bottom: 2px solid #b93d2a; }
 .logo-efi { width: 58px; height: 58px; border-radius: 10px; flex-shrink: 0; display: block; }
 .logo-efi.grand { width: 150px; height: 150px; border-radius: 20px; margin-bottom: .7rem; }
@@ -484,8 +485,10 @@ function elevesBloques() {
 }
 function dessinerBloques() {
   const z = $("bloques"), l = elevesBloques();
-  z.hidden = !l.length;
-  if (!l.length) { z.innerHTML = ""; return; }
+  const ouvertes = Object.keys((BRUT && BRUT.evaluations && BRUT.evaluations.ouvertes) || {});
+  z.classList.toggle("calme", !l.length);
+  z.hidden = !l.length && !ouvertes.length;
+  if (!l.length) { z.innerHTML = ouvertes.length ? `🔓 <strong>Évaluation ouverte (${ouvertes.join(", ")}) : aucun élève bloqué.</strong> Si un élève sort de l'évaluation, il apparaîtra ici avec un bouton « Débloquer ».` : ""; return; }
   z.innerHTML = `<strong>🔒 ${l.length} élève${l.length > 1 ? "s" : ""} bloqué${l.length > 1 ? "s" : ""}</strong> (sorti${l.length > 1 ? "s" : ""} de l'évaluation) :`;
   l.sort((a, b) => a.inc - b.inc).forEach(x => {
     const b = document.createElement("button");
