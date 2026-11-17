@@ -291,7 +291,7 @@ pre.programme { font-size: 1rem; line-height: 1.6; }
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
 <script src="config.js?v=20261014c"></script>
-<script src="evaluations.js?v=20261109c"></script>
+<script src="evaluations.js?v=20261117b"></script>
 <script src="verif.js?v=20261014c"></script>
 <script src="schema.js?v=20261014c"></script>
 <script>
@@ -379,7 +379,7 @@ function tirerQuestions(brutes) {
   for (let i = ordre.length - 1; i > 0; i--) { const j = Math.floor(alea() * (i + 1)); [ordre[i], ordre[j]] = [ordre[j], ordre[i]]; }
   return ordre.map(k => {
     const q = brutes[k], v = Math.floor(alea() * q.variantes.length);
-    const choisie = { ...q.variantes[v], points: q.points, titre: q.titre, num: k + 1, version: "ABC"[v] };
+    const choisie = { ...q.variantes[v], points: q.points, titre: q.titre, num: k + 1, version: "ABCDEFGH"[v] };
     if (choisie.type === "qcm") {
       choisie.bonneReponse = choisie.choix[choisie.bonne];
       const c = [...choisie.choix];
