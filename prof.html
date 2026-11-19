@@ -499,6 +499,17 @@ function dessinerBloques() {
   });
 }
 const TEMPS_SUP = 7;
+const tiersDe = id => !!(((BRUT && BRUT.eleves) || []).find(e => e.id === id) || {}).tiers;
+async function basculerTiers(id, actif, bouton) {
+  if (DEMO) { alert("Mode démonstration : rien n'est envoyé."); return; }
+  if (bouton) { bouton.disabled = true; bouton.textContent = "…"; }
+  try {
+    const r = await fetch(URL_SERVEUR, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ action: "prof", cle: CLE, op: "tiersTemps", id, actif }) });
+    const d = await r.json();
+    if (!d.ok) alert(d.erreur === "operation" ? "Votre script Google n'est pas à jour : recollez Code.gs et déployez une nouvelle version." : "Impossible : " + d.erreur);
+  } catch { alert("Connexion impossible."); }
+  await charger();
+}
 async function tempsSup(id, ev, minutes, bouton) {
   if (DEMO) { alert("Mode démonstration : rien n'est envoyé."); return; }
   if (bouton) { bouton.disabled = true; bouton.textContent = "…"; }
@@ -978,7 +989,7 @@ function etatsEvaluation(liste, evId) {
     else if (type === "rendu") x.rendu = { t, ...(c || {}) };
     else if (type === "incident") x.incidents.push({ t, ...(c || {}) });
     else if (type === "deblocage") x.deblocages.push(t);
-    else if (type === "temps") x.bonus = Math.max(0, Number(contenu) || 0);
+    else if (type === "temps") { x.bonus = Math.max(0, Number(contenu) || 0); x.bonusManuel = true; }
   });
   return Object.values(parId).map(x => {
     const dernierI = Math.max(0, ...x.incidents.map(i => i.t)), dernierD = Math.max(0, ...x.deblocages);
@@ -1006,7 +1017,7 @@ function dessinerEvaluation(liste) {
   pastille.className = "ev-ouverte" + (classesOuvertes.length ? "" : " ev-fermee");
   pastille.textContent = classesOuvertes.length ? "Ouverte pour " + classesOuvertes.join(", ") : "Fermée";
   $("ev-titre").appendChild(pastille);
-  $("ev-info").textContent = `${meta.duree} min · ${meta.nb} questions · sur ${meta.total} points. Ouvrir ou fermer : onglet Pilotage. Un élève bloqué se débloque ici (bouton « Débloquer »). Colonne « Temps sup. » : bouton « +7 min » pour accorder du temps à un élève (avant ou pendant l'épreuve).`;
+  $("ev-info").textContent = `${meta.duree} min · ${meta.nb} questions · sur ${meta.total} points. Ouvrir ou fermer : onglet Pilotage. Un élève bloqué se débloque ici (bouton « Débloquer »). Colonne « Tiers-temps » : un clic l'active pour l'élève, pour toutes les évaluations (un tiers du temps en plus, ajouté automatiquement).`;
 
   const etats = etatsEvaluation(liste, meta.id);
   const rendues = etats.filter(x => x.rendu);
@@ -1028,14 +1039,14 @@ function dessinerEvaluation(liste) {
     { cle: "statut", titre: "Statut", sensDefaut: "asc", valeur: x => ordreStatut[x.statut],
       rendu: (td, x) => { const [c, l] = libStatut[x.statut]; td.innerHTML = `<span class="etat ${c}"></span>`; td.firstChild.textContent = l + (x.rendu && x.rendu.auto ? " (temps écoulé)" : "");
         if (x.statut === "bloque") { const b = document.createElement("button"); b.type = "button"; b.className = "bouton plein"; b.style.cssText = "margin-left:.4rem;padding:.2rem .6rem;font-size:.85rem"; b.textContent = "Débloquer"; b.addEventListener("click", ev => { ev.stopPropagation(); debloquerEleve(x.s.id, meta.id, b); }); td.appendChild(b); } } },
-    { cle: "temps", titre: "Temps sup.", valeur: x => x.bonus,
+    { cle: "temps", titre: "Tiers-temps", valeur: x => tiersDe(x.s.id) ? 1 : 0,
       rendu: (td, x) => {
-        if (x.rendu) { td.textContent = x.bonus ? "+" + x.bonus + " min" : ""; return; }
-        const b = document.createElement("button"); b.type = "button"; b.className = x.bonus ? "bouton plein" : "bouton";
+        const t = tiersDe(x.s.id), min = x.bonusManuel ? x.bonus : t ? Math.ceil(meta.duree / 3) : 0;
+        const b = document.createElement("button"); b.type = "button"; b.className = t ? "bouton plein" : "bouton";
         b.style.cssText = "padding:.2rem .6rem;font-size:.85rem;white-space:nowrap";
-        b.textContent = x.bonus ? `+${x.bonus} min ✓` : `+${TEMPS_SUP} min`;
-        b.title = x.bonus ? "Cliquer pour retirer le temps supplémentaire" : `Accorder ${TEMPS_SUP} minutes de plus à cet élève`;
-        b.addEventListener("click", ev => { ev.stopPropagation(); tempsSup(x.s.id, meta.id, x.bonus ? 0 : TEMPS_SUP, b); });
+        b.textContent = t ? `⅓ temps ✓ (+${min} min)` : "⅓ temps";
+        b.title = t ? "Tiers-temps activé pour toutes les évaluations. Cliquer pour le retirer." : `Activer le tiers-temps pour cet élève (+${Math.ceil(meta.duree / 3)} min ici, et pour toutes les évaluations)`;
+        b.addEventListener("click", ev => { ev.stopPropagation(); basculerTiers(x.s.id, !t, b); });
         td.appendChild(b);
       } },
     { cle: "incidents", titre: "Incidents", valeur: x => x.incidents.length,
