@@ -499,6 +499,7 @@ function dessinerBloques() {
   });
 }
 const TEMPS_SUP = 7;
+const fmtMinProf = x => { const t = Math.round(x * 60), m = Math.floor(t / 60), s = t % 60; return s ? `${m} min ${String(s).padStart(2, "0")} s` : `${m} min`; };
 const tiersDe = id => !!(((BRUT && BRUT.eleves) || []).find(e => e.id === id) || {}).tiers;
 async function basculerTiers(id, actif, bouton) {
   if (DEMO) { alert("Mode démonstration : rien n'est envoyé."); return; }
@@ -1041,11 +1042,11 @@ function dessinerEvaluation(liste) {
         if (x.statut === "bloque") { const b = document.createElement("button"); b.type = "button"; b.className = "bouton plein"; b.style.cssText = "margin-left:.4rem;padding:.2rem .6rem;font-size:.85rem"; b.textContent = "Débloquer"; b.addEventListener("click", ev => { ev.stopPropagation(); debloquerEleve(x.s.id, meta.id, b); }); td.appendChild(b); } } },
     { cle: "temps", titre: "Tiers-temps", valeur: x => tiersDe(x.s.id) ? 1 : 0,
       rendu: (td, x) => {
-        const t = tiersDe(x.s.id), min = x.bonusManuel ? x.bonus : t ? Math.ceil(meta.duree / 3) : 0;
+        const t = tiersDe(x.s.id), min = t ? meta.duree / 3 : x.bonusManuel ? x.bonus : 0;
         const b = document.createElement("button"); b.type = "button"; b.className = t ? "bouton plein" : "bouton";
         b.style.cssText = "padding:.2rem .6rem;font-size:.85rem;white-space:nowrap";
-        b.textContent = t ? `⅓ temps ✓ (+${min} min)` : "⅓ temps";
-        b.title = t ? "Tiers-temps activé pour toutes les évaluations. Cliquer pour le retirer." : `Activer le tiers-temps pour cet élève (+${Math.ceil(meta.duree / 3)} min ici, et pour toutes les évaluations)`;
+        b.textContent = t ? `⅓ temps ✓ (+${fmtMinProf(min)})` : "⅓ temps";
+        b.title = t ? "Tiers-temps activé pour toutes les évaluations. Cliquer pour le retirer." : `Activer le tiers-temps pour cet élève (+${fmtMinProf(meta.duree / 3)} ici, et pour toutes les évaluations)`;
         b.addEventListener("click", ev => { ev.stopPropagation(); basculerTiers(x.s.id, !t, b); });
         td.appendChild(b);
       } },

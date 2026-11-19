@@ -450,7 +450,7 @@ async function charger() {
     S.questions = tirerQuestions(await dechiffrer(S.meta, d.eval.cle));
     S.decalage = d.eval.maintenant - Date.now();
     S.debut = d.eval.debut;
-    S.bonus = (d.eval.manuel ? (Number(d.eval.bonus) || 0) : d.tiers ? Math.ceil(S.meta.duree / 3) : 0);
+    S.bonus = (d.tiers ? S.meta.duree / 3 : d.eval.manuel ? (Number(d.eval.bonus) || 0) : 0); S.tiers = !!d.tiers;
     const l = local.lire(cleLocale(), {});
     const duServeur = d.eval.reponses && d.eval.reponses.version === S.meta.iv ? d.eval.reponses.reponses : {};
     const enLocal = l.version === S.meta.iv ? (l.reponses || {}) : {};
@@ -480,7 +480,7 @@ function info(titre, texte) {
 function consignes() {
   $("cs-titre").textContent = S.meta.titre;
   $("cs-eleve").textContent = `${S.eleve.prenom} · ${S.eleve.classe}`;
-  const dureeTxt = S.bonus ? `${S.meta.duree} min + ${S.bonus} min de temps supplémentaire (tiers-temps)` : `${S.meta.duree} min`;
+  const dureeTxt = S.bonus ? `${S.meta.duree} min + ${fmtMin(S.bonus)} de temps supplémentaire${S.tiers ? " (tiers-temps)" : ""}` : `${S.meta.duree} min`;
   $("cs-duree").textContent = S.reprise ? `${dureeTxt} (déjà commencée)` : dureeTxt;
   $("cs-questions").textContent = `${S.meta.nb} questions · ${S.meta.total} points`;
   $("b-commencer").textContent = S.reprise ? "Reprendre l'évaluation" : "Commencer l'évaluation";
@@ -644,19 +644,20 @@ async function executer() {
 $("b-executer").addEventListener("click", executer);
 
 /* ---------- Chronomètre ---------- */
+const fmtMin = x => { const t = Math.round(x * 60), m = Math.floor(t / 60), s = t % 60; return s ? `${m} min ${String(s).padStart(2, "0")} s` : `${m} min`; };
 function tic() {
   if (!S.debut || S.termine) return;
   const reste = Math.max(0, S.debut + (S.meta.duree + (S.bonus || 0)) * 60000 - maintenant());
   const m = Math.floor(reste / 60000), s = Math.floor(reste / 1000) % 60;
   $("ep-chrono").textContent = `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
   $("ep-chrono").classList.toggle("bientot", reste < 5 * 60000);
-  $("ep-chrono").title = S.bonus ? `Dont ${S.bonus} min de temps supplémentaire` : "";
+  $("ep-chrono").title = S.bonus ? `Dont ${fmtMin(S.bonus)} de temps supplémentaire` : "";
   if (reste <= 0) rendre(true);
 }
 // Le professeur peut accorder du temps supplémentaire pendant l'épreuve : on relit le serveur toutes les 30 s.
 setInterval(async () => {
   if (!S.debut || S.termine || !S.eleve) return;
-  try { const d = await appelGet({ action: "evalEtat", id: S.eleve.id, code: S.eleve.code }); if (d && d.eval && d.eval.id === S.meta.id) S.bonus = (d.eval.manuel ? (Number(d.eval.bonus) || 0) : d.tiers ? Math.ceil(S.meta.duree / 3) : 0); } catch {}
+  try { const d = await appelGet({ action: "evalEtat", id: S.eleve.id, code: S.eleve.code }); if (d && d.eval && d.eval.id === S.meta.id) S.bonus = (d.tiers ? S.meta.duree / 3 : d.eval.manuel ? (Number(d.eval.bonus) || 0) : 0); } catch {}
 }, 30000);
 
 /* ---------- Surveillance ---------- */
