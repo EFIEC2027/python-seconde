@@ -1038,7 +1038,7 @@ function dessinerEvaluation(liste) {
     { cle: "nom", titre: "Élève", classe: "nom", sensDefaut: "asc", valeur: x => (x.s.nom + " " + x.s.prenom).toLowerCase(),
       rendu: (td, x) => { td.textContent = nomComplet(x.s); const sm = document.createElement("small"); sm.textContent = x.s.classe; td.appendChild(sm); } },
     { cle: "statut", titre: "Statut", sensDefaut: "asc", valeur: x => ordreStatut[x.statut],
-      rendu: (td, x) => { const [c, l] = libStatut[x.statut]; td.innerHTML = `<span class="etat ${c}"></span>`; td.firstChild.textContent = l + (x.rendu && x.rendu.auto ? " (temps écoulé)" : "");
+      rendu: (td, x) => { const [c, l] = libStatut[x.statut]; td.innerHTML = `<span class="etat ${c}"></span>`; td.firstChild.textContent = l + (x.rendu && x.rendu.auto === "sorties" ? " (arrêtée : 3 sorties)" : x.rendu && x.rendu.auto ? " (temps écoulé)" : "");
         if (x.statut === "bloque") { const b = document.createElement("button"); b.type = "button"; b.className = "bouton plein"; b.style.cssText = "margin-left:.4rem;padding:.2rem .6rem;font-size:.85rem"; b.textContent = "Débloquer"; b.addEventListener("click", ev => { ev.stopPropagation(); debloquerEleve(x.s.id, meta.id, b); }); td.appendChild(b); } } },
     { cle: "temps", titre: "Tiers-temps", valeur: x => tiersDe(x.s.id) ? 1 : 0,
       rendu: (td, x) => {
