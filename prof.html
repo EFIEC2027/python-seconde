@@ -987,7 +987,12 @@ function cumulBonus(x, meta) {
   if (s === null) return null;
   return Math.min(20, s + (x.rendu ? noteSur20(x.rendu) : 0));
 }
-const noteSur20 = r => r ? (typeof r.note20 === "number" ? r.note20 : (r.max ? Math.round(r.total / r.max * 40) / 2 : 0)) : null;
+const noteSur20 = r => {
+  if (!r) return null;
+  // Mini-test bonus (barème sur 4) : on recalcule depuis les points, au cas où une ancienne page aurait compté sur 20.
+  if (r.max === 4 && typeof r.total === "number" && r.note20 > 4) return r.total;
+  return typeof r.note20 === "number" ? r.note20 : (r.max ? Math.round(r.total / r.max * 40) / 2 : 0);
+};
 const detailQ = (r, k) => r && r.details ? (r.details.find(d => d.q === k + 1) || (r.details.every(d => d.q === undefined) ? r.details[k] : null)) : null;
 
 function etatsEvaluation(liste, evId) {
