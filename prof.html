@@ -324,7 +324,7 @@ select#choix-eleve { border: 1.5px solid var(--trait); border-radius: 8px; paddi
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="config.js?v=20261014c"></script>
 <script src="exercices.js?v=20261110i"></script>
-<script src="evaluations.js?v=20261125b"></script>
+<script src="evaluations.js?v=20261125c"></script>
 <script>window.PARCOURS_PYTHON = window.PARCOURS;</script>
 <script src="algorigrammes.js?v=20261117a"></script>
 <script src="entrainement.js?v=20261117c"></script>
@@ -975,6 +975,18 @@ function evaluationsDemo(eleves, alea) {
   return { ouvertes: { "2nde A": "eval1" }, lignes: lignes.sort((a, b) => a[0] - b[0]) };
 }
 
+/* Mini-test bonus : ses points s'ajoutent à la note d'une autre évaluation (meta.cumulAvec), 20 au maximum. */
+function noteDe(id, evId) {
+  const l = ((BRUT && BRUT.evaluations && BRUT.evaluations.lignes) || []).filter(([, i, e, type]) => i === id && e === evId && type === "rendu");
+  if (!l.length) return null;
+  let c = {}; try { c = JSON.parse(l[l.length - 1][4]); } catch {}
+  return noteSur20(c);
+}
+function cumulBonus(x, meta) {
+  const s = noteDe(x.s.id, meta.cumulAvec);
+  if (s === null) return null;
+  return Math.min(20, s + (x.rendu ? noteSur20(x.rendu) : 0));
+}
 const noteSur20 = r => r ? (typeof r.note20 === "number" ? r.note20 : (r.max ? Math.round(r.total / r.max * 40) / 2 : 0)) : null;
 const detailQ = (r, k) => r && r.details ? (r.details.find(d => d.q === k + 1) || (r.details.every(d => d.q === undefined) ? r.details[k] : null)) : null;
 
@@ -1029,8 +1041,8 @@ function dessinerEvaluation(liste) {
     chiffre(`${rendues.length}`, "copies rendues") +
     chiffre(`${etats.filter(x => x.bloque).length}`, "bloqués en ce moment") +
     chiffre(`${etats.reduce((a, x) => a + x.incidents.length, 0)}`, "incidents au total") +
-    chiffre(moy === null ? "—" : moy.toFixed(1).replace(".", ","), "moyenne", "/ 20") +
-    chiffre(notes.length ? String(mediane(notes)).replace(".", ",") : "—", "médiane", "/ 20");
+    chiffre(moy === null ? "—" : moy.toFixed(1).replace(".", ","), "moyenne", `/ ${meta.bareme || 20}`) +
+    chiffre(notes.length ? String(mediane(notes)).replace(".", ",") : "—", "médiane", `/ ${meta.bareme || 20}`);
 
   const ordreStatut = { bloque: 0, encours: 1, non: 2, rendu: 3 };
   const libStatut = { bloque: ["bloque", "Bloqué"], encours: ["encours", "En cours"], non: ["non", "Pas commencé"], rendu: ["ok", "Rendue"] };
@@ -1049,7 +1061,9 @@ function dessinerEvaluation(liste) {
       } },
     { cle: "incidents", titre: "Incidents", valeur: x => x.incidents.length,
       rendu: (td, x) => { td.textContent = x.incidents.length || ""; td.title = x.incidents.map(i => `${dateHeure(i.t)} : ${NOMS_INCIDENTS[i.type] || i.type}`).join("\n"); if (x.incidents.length) td.style.color = "var(--ko)"; td.style.fontWeight = "700"; } },
-    { cle: "note", titre: "Note / 20", valeur: x => noteSur20(x.rendu),
+    ...(meta.cumulAvec ? [{ cle: "cumul", titre: "Sommative + bonus", valeur: x => cumulBonus(x, meta),
+      rendu: (td, x) => { const c = cumulBonus(x, meta); if (c === null) return; td.textContent = String(c).replace(".", ","); td.style.fontWeight = "800"; td.title = "Note de la sommative + points bonus (20 au maximum)"; } }] : []),
+    { cle: "note", titre: meta.bareme ? `Bonus / ${meta.bareme}` : "Note / 20", valeur: x => noteSur20(x.rendu),
       rendu: (td, x) => { td.textContent = x.rendu ? String(noteSur20(x.rendu)).replace(".", ",") : ""; td.style.fontWeight = "700"; } },
     ...Array.from({ length: meta.nb }, (_, k) => ({ cle: "q" + k, titre: "Q" + (k + 1), valeur: x => { const d = detailQ(x.rendu, k); return d ? d.points : null; },
       rendu: (td, x) => { const d = detailQ(x.rendu, k); td.textContent = d ? String(d.points).replace(".", ",") + (d.v ? " " + d.v : "") : ""; if (d) { td.style.color = d.points === d.max ? "var(--ok)" : d.points === 0 ? "var(--ko)" : ""; td.title = d.v ? `version ${d.v}` : ""; } } })),
@@ -1115,10 +1129,10 @@ $("b-csv-eval").addEventListener("click", () => {
   const meta = LISTE_EVALS.find(e => e.id === EVAL_CHOISIE);
   if (!meta) return;
   const etats = etatsEvaluation(calculer(), meta.id);
-  const entete = ["identifiant", "classe", "prenom", "nom", "statut", "note_sur_20", "incidents", ...Array.from({ length: meta.nb }, (_, k) => "q" + (k + 1))];
+  const entete = ["identifiant", "classe", "prenom", "nom", "statut", meta.bareme ? "bonus_sur_" + meta.bareme : "note_sur_20", ...(meta.cumulAvec ? ["sommative", "sommative_plus_bonus"] : []), "incidents", ...Array.from({ length: meta.nb }, (_, k) => "q" + (k + 1))];
   const lib = { rendu: "rendue", bloque: "bloque", encours: "en cours", non: "pas commence" };
   const echap = v => { const s = String(v ?? ""); return /[";\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
-  const lignes = etats.map(x => [x.s.id, x.s.classe, x.s.prenom, x.s.nom, lib[x.statut], x.rendu ? String(noteSur20(x.rendu)).replace(".", ",") : "", x.incidents.length,
+  const lignes = etats.map(x => [x.s.id, x.s.classe, x.s.prenom, x.s.nom, lib[x.statut], x.rendu ? String(noteSur20(x.rendu)).replace(".", ",") : "", ...(meta.cumulAvec ? [noteDe(x.s.id, meta.cumulAvec), cumulBonus(x, meta)].map(v => v === null ? "" : String(v).replace(".", ",")) : []), x.incidents.length,
     ...Array.from({ length: meta.nb }, (_, k) => { const d = detailQ(x.rendu, k); return d ? String(d.points).replace(".", ",") : ""; })]);
   const csv = "﻿" + [entete, ...lignes].map(l => l.map(echap).join(";")).join("\r\n");
   const a = document.createElement("a");

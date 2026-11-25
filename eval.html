@@ -283,7 +283,7 @@ pre.programme { font-size: 1rem; line-height: 1.6; }
   <div class="fin">
     <div class="carte fin-tete">
       <h1 id="fin-titre">Copie rendue</h1>
-      <p class="note"><span id="fin-note">–</span><small> / 20</small></p>
+      <p class="note"><span id="fin-note">–</span><small id="fin-sur"> / 20</small></p>
       <p id="fin-texte">Ta copie a bien été enregistrée.</p>
     </div>
     <div class="correction" id="fin-correction" hidden></div>
@@ -293,7 +293,7 @@ pre.programme { font-size: 1rem; line-height: 1.6; }
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
 <script src="config.js?v=20261014c"></script>
-<script src="evaluations.js?v=20261125b"></script>
+<script src="evaluations.js?v=20261125c"></script>
 <script src="verif.js?v=20261014c"></script>
 <script src="schema.js?v=20261014c"></script>
 <script>
@@ -449,7 +449,7 @@ async function charger() {
     S.meta = (window.EVALUATIONS || []).find(e => e.id === d.eval.id);
     if (!S.meta) return info("Page à mettre à jour", "Cette évaluation n'est pas encore sur le site. Préviens ton professeur.");
     if (S.meta.mode === "mission") { location.href = "mission.html"; return; }
-    if (d.eval.rendu) return info("Copie déjà rendue", d.eval.note !== undefined && d.eval.note !== null ? `Tu as déjà rendu ta copie. Ta note : ${virgule(d.eval.note)} / 20.` : "Tu as déjà rendu ta copie pour cette évaluation.");
+    if (d.eval.rendu) return info("Copie déjà rendue", d.eval.note !== undefined && d.eval.note !== null ? `Tu as déjà rendu ta copie. Ta note : ${virgule(d.eval.note)} / ${S.meta.bareme || 20}${S.meta.bareme ? " points bonus" : ""}.` : "Tu as déjà rendu ta copie pour cette évaluation.");
     S.questions = tirerQuestions(await dechiffrer(S.meta, d.eval.cle));
     S.decalage = d.eval.maintenant - Date.now();
     S.debut = d.eval.debut;
@@ -782,7 +782,8 @@ async function rendre(auto) {
   for (let i = 0; i < S.questions.length; i++) details.push(await corrigerQuestion(S.questions[i], S.reponses[i]));
   const total = details.reduce((a, d) => a + d.points, 0);
   const max = details.reduce((a, d) => a + d.max, 0);
-  const note20 = sur20(total, max);
+  // bareme : note sur un autre total que 20 (ex. mini-test bonus sur 4 points).
+  const note20 = S.meta.bareme ? (max ? Math.round(total / max * S.meta.bareme * 4) / 4 : 0) : sur20(total, max);
   S.resultat = { total, max, note20, details };
   evenement("rendu", { total, max, note20, details, reponses: S.reponses, auto, fin: maintenant() });
   info("Envoi de ta copie…", "Ne ferme pas la page tant que ce message est affiché.");
@@ -809,7 +810,8 @@ function afficherCorrection() {
   if (!r) return;
   $("fin-titre").textContent = "Copie rendue";
   $("fin-note").textContent = virgule(r.note20);
-  $("fin-texte").textContent = `Tu as obtenu ${virgule(r.total)} points sur ${r.max}. Voici la correction, question par question.`;
+  $("fin-sur").textContent = ` / ${S.meta.bareme || 20}`;
+  $("fin-texte").textContent = S.meta.bareme ? `Tu gagnes ${virgule(r.note20)} point${r.note20 > 1 ? "s" : ""} bonus, ajouté${r.note20 > 1 ? "s" : ""} à ta note de l'évaluation sommative (sans dépasser 20). Voici la correction, question par question.` : `Tu as obtenu ${virgule(r.total)} points sur ${r.max}. Voici la correction, question par question.`;
   const zone = $("fin-correction");
   zone.innerHTML = "";
   S.questions.forEach((q, i) => {

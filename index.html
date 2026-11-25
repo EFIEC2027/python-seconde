@@ -242,7 +242,7 @@ main { max-width: 1040px; margin: 0 auto; padding: 1.8rem 16px 4rem; display: gr
 <script src="algorigrammes.js?v=20261117a"></script>
 <script src="entrainement.js?v=20261117c"></script>
 <script src="accueil.js?v=20261110a"></script>
-<script src="evaluations.js?v=20261125b"></script>
+<script src="evaluations.js?v=20261125c"></script>
 <script>
 "use strict";
 const URL_SERVEUR = (window.CONFIG && CONFIG.url || "").trim();
@@ -308,7 +308,7 @@ async function verifierEval(session) {
       return;
     }
     if (ev && ev.rendu) {
-      etatEval(`<strong></strong><span>Copie rendue.</span>${ev.note != null ? `<span class="note">${String(ev.note).replace(".", ",")} / 20</span>` : ""}`, "rendu");
+      etatEval(`<strong></strong><span>Copie rendue.</span>${ev.note != null ? `<span class="note">${String(ev.note).replace(".", ",")} / ${(meta && meta.bareme) || 20}${meta && meta.bareme ? " points bonus" : ""}</span>` : ""}`, "rendu");
     } else if (ev && meta && meta.mode === "mission") {
       etatEval(FERMEE, "ferme");
       $("carte-mission").classList.remove("ferme");
